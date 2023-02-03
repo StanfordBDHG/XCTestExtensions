@@ -1,5 +1,5 @@
 //
-// This source file is part of the TemplatePackage open-source project
+// This source file is part of the XCTestExtensions open-source project
 //
 // SPDX-FileCopyrightText: 2022 Stanford University and the project authors (see CONTRIBUTORS.md)
 //
@@ -7,19 +7,11 @@
 //
 
 import XCTest
+import XCTestExtensions
 
 
 class TestAppUITests: XCTestCase {
-    override func setUpWithError() throws {
-        try super.setUpWithError()
+    func testDeleteAndLaunch() throws {
         
-        continueAfterFailure = false
-    }
-    
-    
-    func testTemplatePackage() throws {
-        let app = XCUIApplication()
-        app.launch()
-        XCTAssert(app.staticTexts["Stanford University"].waitForExistence(timeout: 0.1))
     }
 }
