@@ -11,9 +11,22 @@ import SwiftUI
 
 @main
 struct UITestsApp: App {
+    @State var text: String = ""
+    @State var secureText: String = ""
+    
+    
     var body: some Scene {
         WindowGroup {
-            Text("XCTestExentions")
+            Form {
+                Section {
+                    TextField("TextField", text: $text)
+                    Text(text.isEmpty ? "No text set ..." : text)
+                }
+                Section {
+                    SecureField("SecureField", text: $secureText)
+                    Text(secureText.isEmpty ? "No secure text set ..." : secureText)
+                }
+            }
         }
     }
 }

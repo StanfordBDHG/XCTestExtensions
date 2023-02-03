@@ -351,6 +351,7 @@
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TestApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TestApp;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "The Test App needs access to the HealthKit records to enable unit tests.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -383,6 +384,7 @@
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TestApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TestApp;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "The Test App needs access to the HealthKit records to enable unit tests.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
