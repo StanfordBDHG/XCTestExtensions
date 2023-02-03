@@ -1,5 +1,15 @@
 # ``XCTestExtensions``
 
+<!--
+                  
+This source file is part of the XCTestExtensions open source project
+
+SPDX-FileCopyrightText: 2022 Stanford University and the project authors (see CONTRIBUTORS.md)
+
+SPDX-License-Identifier: MIT
+             
+-->
+
 XCTestExtensions is a collection of extensions for commonly used functionality in UI tests using XCTest.
 
 You can use XCTestExtensions in your UI tests.
@@ -8,7 +18,7 @@ The framework has the following functionalities:
 
 ### Delete & Launch Application
 
-Deletes the application and relaunches the application. Use this function to completely reset the application, e.g., for system permission screens and alerts.
+Delete and launch the application. Use this function to completely reset the application, e.g., for system permission screens and alerts.
 ```swift
 let app = XCUIApplication()
 app.deleteAndLaunch(withSpringboardAppName: "TestApp")
