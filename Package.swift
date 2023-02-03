@@ -22,6 +22,12 @@ let package = Package(
     targets: [
         .target(
             name: "XCTestExtensions"
+        ),
+        .testTarget(
+            name: "XCTestExtensionsTests",
+            dependencies: [
+                .target(name: "XCTestExtensions")
+            ]
         )
     ]
 )
