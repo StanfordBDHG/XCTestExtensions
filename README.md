@@ -11,7 +11,10 @@ SPDX-License-Identifier: MIT
 # XCTestExtensions
 
 [![Build and Test](https://github.com/StanfordBDHG/XCTestExtensions/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/StanfordBDHG/XCTestExtensions/actions/workflows/build-and-test.yml)
-
+[![codecov](https://codecov.io/gh/StanfordBDHG/XCTestExtensions/branch/main/graph/badge.svg?token=dF75iJxl45)](https://codecov.io/gh/StanfordBDHG/XCTestExtensions)
+[![DOI](https://zenodo.org/badge/597215549.svg)](https://zenodo.org/badge/latestdoi/597215549)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FStanfordBDHG%2FXCTestExtensions%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FStanfordBDHG%2FXCTestExtensions%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions)
 
 XCTestExtensions is a collection of extensions for commonly used functionality in UI tests using XCTest.
 
