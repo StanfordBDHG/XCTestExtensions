@@ -16,12 +16,12 @@ extension XCTestCase {
         settingsApp.terminate()
         settingsApp.launch()
         
-        if settingsApp.staticTexts["PASSWORDS"].waitForExistence(timeout: 0.5) {
+        if settingsApp.staticTexts["PASSWORDS"].waitForExistence(timeout: 5.0) {
             settingsApp.staticTexts["PASSWORDS"].tap()
         }
         
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
-        if springboard.secureTextFields["Passcode field"].waitForExistence(timeout: 20) {
+        if springboard.secureTextFields["Passcode field"].waitForExistence(timeout: 30.0) {
             let passcodeInput = springboard.secureTextFields["Passcode field"]
             passcodeInput.tap()
             passcodeInput.typeText("1234\r")
@@ -30,7 +30,7 @@ extension XCTestCase {
             return
         }
         
-        XCTAssertTrue(settingsApp.tables.cells["PasswordOptionsCell"].waitForExistence(timeout: 5.0))
+        XCTAssertTrue(settingsApp.tables.cells["PasswordOptionsCell"].waitForExistence(timeout: 10.0))
         settingsApp.tables.cells["PasswordOptionsCell"].buttons["chevron"].tap()
         if settingsApp.switches["AutoFill Passwords"].value as? String == "1" {
             settingsApp.switches["AutoFill Passwords"].tap()
