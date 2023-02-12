@@ -50,11 +50,19 @@ extension XCUIApplication {
         textField.delete(count: 5)
         XCTAssert(staticTexts["Example"].waitForExistence(timeout: 5.0))
         
+        textField.delete(count: 42)
+        XCTAssert(staticTexts["No text set ..."].waitForExistence(timeout: 5.0))
+        
+        swipeUp()
+        
         XCTAssert(staticTexts["No secure text set ..."].waitForExistence(timeout: 5.0))
         let secureTextField = secureTextFields["SecureField"]
         secureTextField.enter(value: "Secure Text")
         XCTAssert(staticTexts["Secure Text"].waitForExistence(timeout: 5.0))
         secureTextField.delete(count: 5)
         XCTAssert(staticTexts["Secure"].waitForExistence(timeout: 5.0))
+        
+        secureTextField.delete(count: 42)
+        XCTAssert(staticTexts["No secure text set ..."].waitForExistence(timeout: 5.0))
     }
 }

@@ -16,6 +16,17 @@ var simulateFlakySimulatorTextEntry = false
 
 
 extension XCUIElement {
+    /// Get the current value so we can assert if the text entry was correct.
+    private var currentValue: String {
+        if value as? String == placeholderValue {
+            // If the value is the placeholderValue we assume that the text field has no value entered.
+            return ""
+        } else {
+            return value as? String ?? ""
+        }
+    }
+    
+    
     /// Delete a fixed number of characters in a text field or secure text field.
     /// - Parameter count: The number of characters that should be deleted.
     /// - Parameter checkIfTextWasDeletedCorrectly: Check if the text was deleted correctly.
@@ -51,13 +62,7 @@ extension XCUIElement {
         }
         
         // Get the current value so we can assert if the text deleted was correct.
-        let currentValueCount: Int
-        if value as? String == placeholderValue {
-            // If the value is the placeholderValue we assume that the text field has no value entered.
-            currentValueCount = 0
-        } else {
-            currentValueCount = (value as? String ?? "").count
-        }
+        let currentValueCount = currentValue.count
         
         coordinate(withNormalizedOffset: CGVector(dx: 0.99, dy: 0.5)).tap()
         XCTAssert(XCUIApplication().keyboards.firstMatch.waitForExistence(timeout: 2.0))
@@ -69,9 +74,9 @@ extension XCUIElement {
         
         // Check of the text was deleted correctly:
         if checkIfTextWasDeletedCorrectly {
-            let countAfterDeletion = (value as? String ?? "").count
+            let countAfterDeletion = currentValue.count
             
-            if currentValueCount - count < countAfterDeletion {
+            if max(currentValueCount - count, 0) < countAfterDeletion {
                 delete(
                     count: countAfterDeletion - (currentValueCount - count),
                     checkIfTextWasDeletedCorrectly: true,
@@ -93,13 +98,7 @@ extension XCUIElement {
         }
         
         // Get the current value so we can assert if the text entry was correct.
-        let currentValue: String
-        if value as? String == placeholderValue {
-            // If the value is the placeholderValue we assume that the text field has no value entered.
-            currentValue = ""
-        } else {
-            currentValue = value as? String ?? ""
-        }
+        let previousValue = currentValue
         
         // Enter the value
         coordinate(withNormalizedOffset: CGVector(dx: 0.99, dy: 0.5)).tap()
@@ -112,20 +111,20 @@ extension XCUIElement {
         
         // Check of the text was entered correctly:
         if checkIfTextWasEnteredCorrectly {
-            let valueAfterTextEntry = value as? String ?? ""
+            let valueAfterTextEntry = currentValue
             
             if self.elementType == .secureTextField {
-                if currentValue.isEmpty && textToEnter.count != valueAfterTextEntry.count {
+                if previousValue.isEmpty && textToEnter.count != valueAfterTextEntry.count {
                     // We delete the text twice to ensure that we have an empty text field even if the textfield might go byeond the current scope
                     delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
                     delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
                     
                     enter(
-                        value: currentValue + textToEnter,
+                        value: previousValue + textToEnter,
                         checkIfTextWasEnteredCorrectly: true,
                         recursiveDepth: recursiveDepth + 1
                     )
-                } else if currentValue.count + textToEnter.count != valueAfterTextEntry.count {
+                } else if previousValue.count + textToEnter.count != valueAfterTextEntry.count {
                     XCTFail(
                         """
                         The text entered in the secure text field doesn't seem to match the desired length.
@@ -134,13 +133,13 @@ extension XCUIElement {
                     )
                 }
             } else {
-                if currentValue + textToEnter != valueAfterTextEntry {
+                if previousValue + textToEnter != valueAfterTextEntry {
                     // We delete the text twice to ensure that we have an empty text field even if the textfield might go byeond the current scope
                     delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
                     delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
                     
                     enter(
-                        value: currentValue + textToEnter,
+                        value: previousValue + textToEnter,
                         checkIfTextWasEnteredCorrectly: true,
                         recursiveDepth: recursiveDepth + 1
                     )
