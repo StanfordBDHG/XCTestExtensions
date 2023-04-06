@@ -10,9 +10,9 @@ SPDX-License-Identifier: MIT
              
 -->
 
-XCTestExtensions is a collection of ...
+XCTestApp is a collection of types to run tests inside a test application.
 
-Swift Packages tests are not capable to test user interface elements or test iOS features that are only available when code runs in an application, e.g., HealthKit, the Secure Enclave, and more.
+Swift Packages tests cannot test user interface elements or iOS features that are only available when code runs in an application, e.g., HealthKit, the Secure Enclave, and more.
 You can use XCTestApp in an app that tests framework functionality and verifies them using UI tests.
 
 The framework has the following functionalities:
@@ -74,6 +74,30 @@ struct ExampleTestCaseTest: TestAppTestCase {
             _ = try XCTUnwrap(Optional<Int>.none)
             throw XCTestFailure(message: "Did not trigger the expected assertion.")
         } catch { }
+    }
+}
+```
+
+
+### TestAppView
+
+You can use the ``TestAppView`` to automatically run a ``TestAppTestCase`` instance and display the result for a UI test to use:
+```swift
+struct ContentView: View {
+    var body: some View {
+        TestAppView(testCase: TestAppTestCaseTest())
+    }
+}
+```
+
+A UI test can then detect the passing state of the ``TestAppTestCase`` using a check of the existence of a static text:
+```swift
+class XCTestAppTests: XCTestCase {
+    func testTestAppTestCaseTest() throws {
+        let app = XCUIApplication()
+        app.launch()
+        
+        XCTAssert(app.staticTexts["Passed"].waitForExistence(timeout: 5))
     }
 }
 ```
