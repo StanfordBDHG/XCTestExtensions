@@ -18,19 +18,7 @@ struct TestApp: App {
     
     var body: some Scene {
         WindowGroup {
-            Form {
-                Section {
-                    TextField("TextField", text: $text)
-                    Text(text.isEmpty ? "No text set ..." : text)
-                }
-                Section {
-                    SecureField("SecureField", text: $secureText)
-                    Text(secureText.isEmpty ? "No secure text set ..." : secureText)
-                }
-                Section {
-                    TestAppView(testCase: TestAppTestCaseTest())
-                }
-            }
+            TestAppTestsView(tests: TestAppTestCaseEnum.self)
         }
     }
 }

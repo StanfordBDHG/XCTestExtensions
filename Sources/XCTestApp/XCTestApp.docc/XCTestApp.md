@@ -101,3 +101,36 @@ class XCTestAppTests: XCTestCase {
     }
 }
 ```
+
+### TestAppTests & TestAppTestsView
+
+The ``TestAppTests`` protocol allows the definition of an enum of different test cases in your test application that are associated with SwiftUI views:
+```swift
+enum TestAppTestsExample: String, TestAppTests {
+    case firstTest = "First Test"
+    case secondTest = "Second Test"
+    
+    
+    func view(withNavigationPath path: Binding<NavigationPath>) -> some View {
+        switch self {
+        case .firstTest:
+            FirstTestTestsView()
+        case .secondTest:
+            SecondTestTestsView()
+        }
+    }
+}
+```
+
+The ``TestAppTestsView`` can be subsequently used to display a `NavigationStack` and `List` containing all the test cases to simply navigate to each test case view:
+```swift
+@main
+struct UITestsApp: App {
+    var body: some Scene {
+        WindowGroup {
+            TestAppTestsView<TestAppTestsExample>()
+        }
+    }
+}
+```
+

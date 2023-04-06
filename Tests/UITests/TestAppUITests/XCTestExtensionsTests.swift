@@ -15,6 +15,8 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
         
+        app.staticTexts["XCTestExtensions"].tap()
+        
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
         XCTAssert(app.staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
     }
@@ -26,6 +28,8 @@ class XCTestExtensionsTests: XCTestCase {
         
         let app = XCUIApplication()
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
+        
+        app.staticTexts["XCTestExtensions"].tap()
         
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
         XCTAssert(app.staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
@@ -39,6 +43,8 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
         
+        app.staticTexts["XCTestExtensions"].tap()
+        
         simulateFlakySimulatorTextEntry = false
         try app.callTextEntryExtensions()
     }
@@ -46,6 +52,8 @@ class XCTestExtensionsTests: XCTestCase {
     func testFlakyTextEntry() throws {
         let app = XCUIApplication()
         app.launch()
+        
+        app.staticTexts["XCTestExtensions"].tap()
         
         simulateFlakySimulatorTextEntry = true
         try app.callTextEntryExtensions()

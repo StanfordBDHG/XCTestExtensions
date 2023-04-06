@@ -10,7 +10,7 @@ import SwiftUI
 import XCTestApp
 
 
-struct TestAppTestCaseTest: TestAppTestCase {
+struct XCTestAppTestCaseTest: TestAppTestCase {
     func runTests() async throws {
         try testAssert()
         try await testAssertEqual()
