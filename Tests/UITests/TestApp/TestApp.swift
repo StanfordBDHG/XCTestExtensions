@@ -7,10 +7,11 @@
 //
 
 import SwiftUI
+import XCTestApp
 
 
 @main
-struct UITestsApp: App {
+struct TestApp: App {
     @State var text: String = ""
     @State var secureText: String = ""
     
@@ -25,6 +26,9 @@ struct UITestsApp: App {
                 Section {
                     SecureField("SecureField", text: $secureText)
                     Text(secureText.isEmpty ? "No secure text set ..." : secureText)
+                }
+                Section {
+                    TestAppView(testCase: TestAppTestCaseTest())
                 }
             }
         }

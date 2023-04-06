@@ -7,11 +7,13 @@
 //
 
 import XCTest
-import XCTestExtensions
 
 
-final class XCTestExtensionsTests: XCTestCase {
-    func testXCTestExtensions() throws {
-        XCTAssert(true)
+class XCTestAppTests: XCTestCase {
+    func testTestAppTestCaseTest() throws {
+        let app = XCUIApplication()
+        app.launch()
+        
+        XCTAssert(app.staticTexts["Passed"].waitForExistence(timeout: 5))
     }
 }
