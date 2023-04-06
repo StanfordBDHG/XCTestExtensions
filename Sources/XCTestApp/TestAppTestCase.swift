@@ -15,6 +15,7 @@ public protocol TestAppTestCase: Identifiable {
 
 
 extension TestAppTestCase {
+    /// Identifier of the ``TestAppTestCase`` providing a unique value for each ``TestAppTestCase`` type.
     public var id: ObjectIdentifier {
         ObjectIdentifier(Self.self)
     }
