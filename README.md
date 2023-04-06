@@ -18,13 +18,13 @@ SPDX-License-Identifier: MIT
 
 This Swift Package provides convenient extension points to write tests using XCTest.
 
-`XCTestExtensions` is a collection of extensions for commonly used functionality in UI tests using XCTest. You can find out more about [`XCTestExtensions` in the API documentation]([API documentation](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions/documentation/xctestextensions).
+`XCTestExtensions` is a collection of extensions for commonly used functionality in UI tests using XCTest. You can learn more about [`XCTestExtensions` in the API documentation](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions/documentation/xctestextensions).
 It includes the functionality to 
 - delete & launch an application to reset the application
 - disable password autofill on an iOS simulator to avoid challenges with the text entry in secure text fields
 - enable a simple text entry in plain and secure text fields
 
-The `XCTestApp` target enables writing test-based apps that can be verified in a UI test. You can find out more about [`XCTestApp` in the API documentation]([API documentation](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions/documentation/xctestapp).
+The `XCTestApp` target enables writing test-based apps that can be verified in a UI test. You can learn more about [`XCTestApp` in the API documentation](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions/documentation/xctestapp).
 
 ## Installation
 
