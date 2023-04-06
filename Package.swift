@@ -17,9 +17,13 @@ let package = Package(
         .iOS(.v16)
     ],
     products: [
+        .library(name: "XCTestApp", targets: ["XCTestApp"]),
         .library(name: "XCTestExtensions", targets: ["XCTestExtensions"])
     ],
     targets: [
+        .target(
+            name: "XCTestApp"
+        ),
         .target(
             name: "XCTestExtensions"
         ),

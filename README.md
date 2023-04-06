@@ -16,56 +16,15 @@ SPDX-License-Identifier: MIT
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FStanfordBDHG%2FXCTestExtensions%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FStanfordBDHG%2FXCTestExtensions%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions)
 
-XCTestExtensions is a collection of extensions for commonly used functionality in UI tests using XCTest.
+This Swift Package provides convenient extension points to write tests using XCTest.
 
+`XCTestExtensions` is a collection of extensions for commonly used functionality in UI tests using XCTest. You can find out more about [`XCTestExtensions` in the API documentation]([API documentation](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions/documentation/xctestextensions).
+It includes the functionality to 
+- delete & launch an application to reset the application
+- disable password autofill on an iOS simulator to avoid challenges with the text entry in secure text fields
+- enable a simple text entry in plain and secure text fields
 
-## How To Use XCTestExtensions
-
-You can use XCTestExtensions in your UI tests. The [API documentation](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions/documentation) provides a detailed overview of the public interface of XCTestExtensions.
-
-The framework has the following functionalities:
-
-### Delete & Launch Application
-
-Delete and launch the application. Use this function to completely reset the application, e.g., for system permission screens and alerts.
-```swift
-let app = XCUIApplication()
-app.deleteAndLaunch(withSpringboardAppName: "TestApp")
-```
-
-
-### Disable Password Autofill
-
-The iOS Simulator has enabled password autofill by default, which can interfere with text entry in password fields in UI tests. The `XCTestCase` extension provides the `disablePasswordAutofill` to navigate to the settings app and disable password autofill.
-```swift
-class TestAppUITests: XCTestCase {
-    func testDeleteAndLaunch() throws {
-        disablePasswordAutofill()
-        
-        // ...
-    }
-}
-```
-
-
-### Text Entry
-
-Allows a simple extension on `XCUIElement` to delete and type text in a text field or secure text field.
-```swift
-let app = XCUIApplication()
-
-let textField = app.textFields["TextField"]
-textField.enter(value: "Example Text")
-textField.delete(count: 5)
-
-let secureTextField = app.secureTextFields["SecureField"]
-secureTextField.enter(value: "Secure Text")
-secureTextField.delete(count: 5)
-```
-
-Unfortunately, the iOS simulator sometimes has flaky behavior when entering text in a simulator with low computation resources.
-The `enter(value:)` and `delete(count:)` methods provide the `checkIfTextWasEnteredCorrectly` and `checkIfTextWasDeletedCorrectly` parameters that are set to true by default to check if the values were entered correctly. If your text entry does fail to do so, e.g., an entry in a secure text field, set the `checkIfTextWasEnteredCorrectly` or `checkIfTextWasDeletedCorrectly` parameters to `false`. 
-
+The `XCTestApp` target enables writing test-based apps that can be verified in a UI test. You can find out more about [`XCTestApp` in the API documentation]([API documentation](https://swiftpackageindex.com/StanfordBDHG/XCTestExtensions/documentation/xctestapp).
 
 ## Installation
 
