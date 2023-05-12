@@ -18,19 +18,19 @@ on:
 jobs:
   build_and_test-spm:
     name: Build and Test Swift Package
-    uses: StanfordSpezi/.github/.github/workflows/build-and-test-xcodebuild-spm.yml@v1
+    uses: StanfordSpezi/.github/.github/workflows/build-and-test-xcodebuild-spm.yml@v2
     with:
       scheme: XCTestExtensions-Package
   build_and_test-uitests:
     name: Build and Test UITest App
-    uses: StanfordSpezi/.github/.github/workflows/build-and-test-xcodebuild.yml@v1
+    uses: StanfordSpezi/.github/.github/workflows/build-and-test-xcodebuild.yml@v2
     with:
       xcodeprojname: Tests/UITests/UITests.xcodeproj
       scheme: TestApp
   create-and-upload-coverage-report:
     name: Create and Upload Coverage Report
     needs: [build_and_test-spm, build_and_test-uitests]
-    uses: StanfordSpezi/.github/.github/workflows/create-and-upload-coverage-report.yml@v1
+    uses: StanfordSpezi/.github/.github/workflows/create-and-upload-coverage-report.yml@v2
     with:
       coveragereports: TestApp.xcresult XCTestExtensions-Package.xcresult
     secrets:
