@@ -157,11 +157,22 @@ extension XCUIElement {
     
     
     private func selectField() {
+        let app = XCUIApplication()
+        let keyboard = app.keyboards.firstMatch
+        
+        if keyboard.waitForExistence(timeout: 1.0) && keyboard.buttons["return"].isHittable {
+            keyboard.buttons["return"].tap()
+        }
+        
         // Select the textfield
         var offset = 0.99
         repeat {
             coordinate(withNormalizedOffset: CGVector(dx: offset, dy: 0.5)).tap()
             offset -= 0.05
-        } while !XCUIApplication().keyboards.firstMatch.waitForExistence(timeout: 2.0) && offset > 0
+        } while !keyboard.waitForExistence(timeout: 2.0) && offset > 0
+        
+        if !keyboard.buttons["space"].isHittable && app.buttons["Continue"].isHittable {
+            app.buttons["Continue"].tap()
+        }
     }
 }
