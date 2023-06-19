@@ -98,7 +98,7 @@ extension XCUIElement {
             }
         }
         
-        pressReturn()
+        XCUIApplication().dismissKeyboard()
     }
     
     private func enter( // swiftlint:disable:this function_default_parameter_at_end
@@ -164,7 +164,7 @@ extension XCUIElement {
             }
         }
         
-        pressReturn()
+        XCUIApplication().dismissKeyboard()
     }
     
     
@@ -173,7 +173,7 @@ extension XCUIElement {
         let keyboard = app.keyboards.firstMatch
         
         // Press the return button if the keyboard is currently active.
-        pressReturn()
+        app.dismissKeyboard()
         
         // Select the textfield
         var offset = 0.99
@@ -184,14 +184,6 @@ extension XCUIElement {
         
         if !keyboard.buttons["space"].isHittable && app.buttons["Continue"].isHittable {
             app.buttons["Continue"].tap()
-        }
-    }
-    
-    private func pressReturn() {
-        let keyboard = XCUIApplication().keyboards.firstMatch
-        
-        if keyboard.waitForExistence(timeout: 1.0) && keyboard.buttons["return"].isHittable {
-            keyboard.buttons["return"].tap()
         }
     }
 }
