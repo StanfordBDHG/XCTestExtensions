@@ -73,7 +73,7 @@ extension XCUIElement {
     }
     
     
-    private func delete( // swiftlint:disable:this function_default_parameter_at_end
+    private func delete(
         count: Int,
         checkIfTextWasDeletedCorrectly: Bool,
         dismissKeyboard: Bool,
@@ -117,7 +117,7 @@ extension XCUIElement {
         }
     }
     
-    private func enter( // swiftlint:disable:this function_default_parameter_at_end
+    private func enter(
         value textToEnter: String,
         checkIfTextWasEnteredCorrectly: Bool,
         dismissKeyboard: Bool,
