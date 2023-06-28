@@ -43,7 +43,7 @@ extension XCTestCase {
             counter += 1
         }
         
-        sleep(2)
+        sleep(3)
         
         settingsApp.tables.cells["PasswordOptionsCell"].tap()
         
