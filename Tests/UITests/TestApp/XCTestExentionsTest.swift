@@ -10,20 +10,35 @@ import SwiftUI
 
 
 struct XCTestExentionsTest: View {
-    @State var text: String = ""
-    @State var secureText: String = ""
-    
+    @State var text = ""
+    @State var secureText = ""
+    @State var accidentalPress = false
     
     var body: some View {
         Form {
+            Section("Accidental Buttons") {
+                // we are testing that our keyboard logic doesn't accidentally tap buttons it shouldn't tap
+                Button("Done", action: accidentalAction)
+                Button("Continue", action: accidentalAction)
+                Button("Return", action: accidentalAction)
+                if accidentalPress {
+                    Text("Button was pressed!")
+                        .foregroundColor(.red)
+                }
+            }
             Section {
                 TextField("TextField", text: $text)
                 Text(text.isEmpty ? "No text set ..." : text)
             }
+                .submitLabel(.continue)
             Section {
                 SecureField("SecureField", text: $secureText)
                 Text(secureText.isEmpty ? "No secure text set ..." : secureText)
             }
         }
+    }
+
+    func accidentalAction() {
+        accidentalPress = true
     }
 }
