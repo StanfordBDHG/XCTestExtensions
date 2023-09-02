@@ -1,8 +1,9 @@
 //
-//  DismissKeyboardTest.swift
-//  TestApp
+// This source file is part of the Stanford XCTestExtensions open-source project
 //
-//  Created by Andreas Bauer on 02.09.23.
+// SPDX-FileCopyrightText: 2023 Stanford University and the project authors (see CONTRIBUTORS.md)
+//
+// SPDX-License-Identifier: MIT
 //
 
 import SwiftUI

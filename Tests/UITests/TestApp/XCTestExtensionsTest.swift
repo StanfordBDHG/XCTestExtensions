@@ -9,7 +9,7 @@
 import SwiftUI
 
 
-struct XCTestExentionsTest: View {
+struct XCTestExtensionsTest: View {
     @State var text = ""
     @State var secureText = ""
     @State var accidentalPress = false

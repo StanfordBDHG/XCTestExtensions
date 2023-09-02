@@ -21,7 +21,7 @@ enum TestAppTestCaseEnum: String, TestAppTests {
         case .xcTestApp:
             TestAppView(testCase: XCTestAppTestCaseTest())
         case .xcTestExtensions:
-            XCTestExentionsTest()
+            XCTestExtensionsTest()
         case .dismissKeyboard:
             DismissKeyboardTest()
         }
