@@ -17,8 +17,18 @@ extension XCTestCase {
         settingsApp.terminate()
         settingsApp.launch()
         
-        if settingsApp.staticTexts["PASSWORDS"].waitForExistence(timeout: 5.0) {
-            settingsApp.staticTexts["PASSWORDS"].tap()
+        XCTAssert(settingsApp.staticTexts["PASSWORDS"].waitForExistence(timeout: 5.0))
+        settingsApp.staticTexts["PASSWORDS"].tap()
+        
+        if #available(iOS 17.2, *) {
+            sleep(2)
+            
+            guard settingsApp.navigationBars.staticTexts["Passwords"].waitForExistence(timeout: 2.0) else {
+                os_log("Could not open the passwords section in the iOS 17.2 simulator due to a bug that immediately closed the passwords section.")
+                return
+            }
+        } else {
+            XCTAssert(settingsApp.navigationBars.staticTexts["Passwords"].waitForExistence(timeout: 2.0))
         }
         
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
