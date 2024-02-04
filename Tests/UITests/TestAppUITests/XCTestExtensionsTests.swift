@@ -42,7 +42,9 @@ class XCTestExtensionsTests: XCTestCase {
     }
     
     func testDisablePasswordAutofill() throws {
+        #if os(iOS)
         try disablePasswordAutofill()
+        #endif
     }
     
     func testTextEntry() throws {
@@ -50,8 +52,7 @@ class XCTestExtensionsTests: XCTestCase {
         app.launch()
         
         app.staticTexts["XCTestExtensions"].tap()
-        
-        simulateFlakySimulatorTextEntry = false
+
         try app.callTextEntryExtensions()
     }
     
@@ -63,6 +64,7 @@ class XCTestExtensionsTests: XCTestCase {
         
         simulateFlakySimulatorTextEntry = true
         try app.callTextEntryExtensions()
+        simulateFlakySimulatorTextEntry = false
     }
 
     func testLongTextEntries() throws {
@@ -74,10 +76,11 @@ class XCTestExtensionsTests: XCTestCase {
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
         let textField = app.textFields["TextField"]
 
-        try textField.enter(value: "This is a very long text and a bunch more", checkIfTextWasEnteredCorrectly: false)
-        XCTAssert(app.staticTexts["This is a very long text and a bunch more"].waitForExistence(timeout: 5))
+        let message = "This is a very long text and some more"
+        try textField.enter(value: message, checkIfTextWasEnteredCorrectly: false)
+        XCTAssert(app.staticTexts[message].waitForExistence(timeout: 5))
         try textField.enter(value: " ...", checkIfTextWasEnteredCorrectly: false)
-        XCTAssert(app.staticTexts["This is a very long text and a bunch more ..."].waitForExistence(timeout: 5))
+        XCTAssert(app.staticTexts["\(message) ..."].waitForExistence(timeout: 5))
     }
 
     func testKeyboardBehavior() throws {
@@ -86,7 +89,6 @@ class XCTestExtensionsTests: XCTestCase {
         app.launch()
 
         app.staticTexts["DismissKeyboard"].tap()
-
         let checkLabel = { (label: String) in
             app.textFields[label].selectField(dismissKeyboard: false)
             XCTAssertTrue(app.keyboards.firstMatch.exists)
@@ -97,7 +99,7 @@ class XCTestExtensionsTests: XCTestCase {
             sleep(1)
             XCTAssertFalse(app.keyboards.firstMatch.exists)
         }
-
+        
         // this way we know exactly which button failed by line numbers.
         checkLabel("Continue")
         checkLabel("Done")
@@ -125,7 +127,9 @@ extension XCUIApplication {
         XCTAssert(staticTexts["No text set ..."].waitForExistence(timeout: 5))
 
         dismissKeyboard()
+        #if !os(visionOS)
         swipeUp()
+        #endif
 
         XCTAssert(staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
         let secureTextField = secureTextFields["SecureField"]
