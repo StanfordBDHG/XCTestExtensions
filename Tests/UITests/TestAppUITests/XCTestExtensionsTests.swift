@@ -42,7 +42,6 @@ class XCTestExtensionsTests: XCTestCase {
     }
     
     func testDisablePasswordAutofill() throws {
-        throw XCTSkip("Settings app is crashing on iOS > 17.2")
         try disablePasswordAutofill()
     }
     
