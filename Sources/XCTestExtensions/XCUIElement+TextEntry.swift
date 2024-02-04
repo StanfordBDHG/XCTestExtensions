@@ -10,7 +10,7 @@ import OSLog
 import XCTest
 
 
-/// An internal flag that is used to test the flaky simulator text entry behaviour in the iOS simulator.
+/// An internal flag that is used to test the flaky simulator text entry behavior in the iOS simulator.
 ///
 /// Do not use this flag outside of the UI tests in the ``XCTestExtensions`` target!
 var simulateFlakySimulatorTextEntry = false
@@ -77,7 +77,7 @@ extension XCUIElement {
         count: Int,
         checkIfTextWasDeletedCorrectly: Bool,
         dismissKeyboard: Bool,
-        // We put this paramter at the end of the function to mimic the public interface with an internal extension.
+        // We put this parameter at the end of the function to mimic the public interface with an internal extension.
         recursiveDepth: Int
     ) throws {
         guard recursiveDepth <= 2 else {
@@ -90,7 +90,7 @@ extension XCUIElement {
         
         // Select the textfield
         selectField(dismissKeyboard: dismissKeyboard)
-        
+
         // Delete the text
         if simulateFlakySimulatorTextEntry && recursiveDepth < 2 {
             typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: count - 1))
@@ -121,7 +121,7 @@ extension XCUIElement {
         value textToEnter: String,
         checkIfTextWasEnteredCorrectly: Bool,
         dismissKeyboard: Bool,
-        // We put this paramter at the end of the function to mimic the public interface with an internal extension.
+        // We put this parameter at the end of the function to mimic the public interface with an internal extension.
         recursiveDepth: Int
     ) throws {
         guard recursiveDepth <= 2 else {
@@ -191,7 +191,7 @@ extension XCUIElement {
 
     /// Taps the text field on a XCUIElement that is a text field or secure text field.
     ///
-    /// - Note: This will not necessarly bring up the keyboard in the simulator. Don't expect buttons to show there.
+    /// - Note: This will not necessarily bring up the keyboard in the simulator. Don't expect buttons to show there.
     ///     If the user interacted with the Simulator (e.g. Mouse clicks) the keyboard won't show as the simulator expects input via the Mac Keyboard.
     ///     This is controlled via I/O -> Keyboard -> Connect Hardware Keyboard / Toggle Software Keyboard
     func selectField(dismissKeyboard: Bool) {
@@ -202,13 +202,18 @@ extension XCUIElement {
         if dismissKeyboard {
             app.dismissKeyboard()
         }
-        
-        // Select the text field
+
+        #if os(visionOS)
+        tap()
+        XCTAssert(keyboard.waitForExistence(timeout: 2.0))
+        #else
+        // Select the text field, see https://stackoverflow.com/questions/38523125/place-cursor-at-the-end-of-uitextview-under-uitest
         var offset = 0.99
         repeat {
             coordinate(withNormalizedOffset: CGVector(dx: offset, dy: 0.5)).tap()
             offset -= 0.05
         } while !keyboard.waitForExistence(timeout: 2.0) && offset > 0
+        #endif
 
         // With latest simulator releases it seems like the "swift to type" tutorial isn't popping up anymore.
         // For more information see https://developer.apple.com/forums/thread/650826.

@@ -17,23 +17,42 @@ on:
 
 jobs:
   buildandtest:
-    name: Build and Test Swift Package
+    name: Build and Test Swift Package iOS
     uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       artifactname: XCTestExtensions-Package.xcresult
       runsonlabels: '["macOS", "self-hosted"]'
       scheme: XCTestExtensions-Package
+  buildandtestvisionos:
+    name: Build and Test Swift Package visionOS
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
+    with:
+      artifactname: XCTestExtensions-Package-visionOS.xcresult
+      resultBundle: XCTestExtensions-Package-visionOS.xcresult
+      runsonlabels: '["macOS", "self-hosted"]'
+      scheme: XCTestExtensions-Package
+      destination: 'platform=visionOS Simulator,name=Apple Vision Pro'
   buildandtestuitests:
-    name: Build and Test UI Tests
+    name: Build and Test UI Tests iOS
     uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       artifactname: TestApp.xcresult
       runsonlabels: '["macOS", "self-hosted"]'
       path: Tests/UITests
       scheme: TestApp
+  buildandtestuitestsvisionos:
+    name: Build and Test UI Tests visionOS
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
+    with:
+      artifactname: TestApp-visionOS.xcresult
+      resultBundle: TestApp-visionOS.xcresult
+      runsonlabels: '["macOS", "self-hosted"]'
+      path: Tests/UITests
+      scheme: TestApp
+      destination: 'platform=visionOS Simulator,name=Apple Vision Pro'
   uploadcoveragereport:
     name: Upload Coverage Report
-    needs: [buildandtest, buildandtestuitests]
+    needs: [buildandtest, buildandtestvisionos, buildandtestuitests, buildandtestuitestsvisionos]
     uses: StanfordBDHG/.github/.github/workflows/create-and-upload-coverage-report.yml@v2
     with:
-      coveragereports: XCTestExtensions-Package.xcresult TestApp.xcresult
+      coveragereports: XCTestExtensions-Package.xcresult XCTestExtensions-Package-visionOS.xcresult TestApp.xcresult TestApp-visionOS.xcresult

@@ -11,6 +11,12 @@ import XCTest
 
 
 class XCTestExtensionsTests: XCTestCase {
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+
+        continueAfterFailure = false
+    }
+
     func testDeleteAndLaunch() throws {
         let app = XCUIApplication()
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
@@ -36,6 +42,7 @@ class XCTestExtensionsTests: XCTestCase {
     }
     
     func testDisablePasswordAutofill() throws {
+        throw XCTSkip("Settings app is crashing on iOS > 17.2")
         try disablePasswordAutofill()
     }
     
@@ -57,6 +64,21 @@ class XCTestExtensionsTests: XCTestCase {
         
         simulateFlakySimulatorTextEntry = true
         try app.callTextEntryExtensions()
+    }
+
+    func testLongTextEntries() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        app.staticTexts["XCTestExtensions"].tap()
+
+        XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
+        let textField = app.textFields["TextField"]
+
+        try textField.enter(value: "This is a very long text and a bunch more", checkIfTextWasEnteredCorrectly: false)
+        XCTAssert(app.staticTexts["This is a very long text and a bunch more"].waitForExistence(timeout: 5))
+        try textField.enter(value: " ...", checkIfTextWasEnteredCorrectly: false)
+        XCTAssert(app.staticTexts["This is a very long text and a bunch more ..."].waitForExistence(timeout: 5))
     }
 
     func testKeyboardBehavior() throws {
