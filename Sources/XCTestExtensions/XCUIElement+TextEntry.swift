@@ -205,7 +205,7 @@ extension XCUIElement {
 
         #if os(visionOS)
         tap()
-        XCTAssert(keyboard.waitForExistence(timeout: 2.0))
+        // keyboard is not available on visionOS
         #else
         // Select the text field, see https://stackoverflow.com/questions/38523125/place-cursor-at-the-end-of-uitextview-under-uitest
         var offset = 0.99
