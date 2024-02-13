@@ -97,7 +97,7 @@ extension XCUIElement {
 
         // Delete the text
         if simulateFlakySimulatorTextEntry && recursiveDepth < 2 {
-            typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: count - 1))
+            typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: max(0, count - 1)))
         } else {
             typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: count))
         }
