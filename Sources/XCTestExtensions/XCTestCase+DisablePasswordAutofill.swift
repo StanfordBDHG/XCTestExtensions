@@ -44,7 +44,7 @@ extension XCTestCase {
             XCTAssert(settingsApp.navigationBars.staticTexts["Passwords"].waitForExistence(timeout: 2.0))
         }
         
-        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let springboard = XCUIApplication(bundleIdentifier: XCUIApplication.homeScreenBundle)
         if springboard.secureTextFields["Passcode field"].waitForExistence(timeout: 30.0) {
             let passcodeInput = springboard.secureTextFields["Passcode field"]
             passcodeInput.tap()

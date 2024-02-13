@@ -42,12 +42,14 @@ extension XCUIElement {
         checkIfTextWasDeletedCorrectly: Bool = true,
         dismissKeyboard: Bool = true
     ) throws {
-        try delete(
-            count: count,
-            checkIfTextWasDeletedCorrectly: checkIfTextWasDeletedCorrectly,
-            dismissKeyboard: dismissKeyboard,
-            recursiveDepth: 0
-        )
+        // Select the textfield
+        selectField(dismissKeyboard: dismissKeyboard)
+
+        try performDelete(count: count, checkIfTextWasDeletedCorrectly: checkIfTextWasDeletedCorrectly, recursiveDepth: 0)
+
+        if dismissKeyboard {
+            XCUIApplication().dismissKeyboard()
+        }
     }
     
     /// Type a text in a text field or secure text field.
@@ -64,32 +66,34 @@ extension XCUIElement {
         checkIfTextWasEnteredCorrectly: Bool = true,
         dismissKeyboard: Bool = true
     ) throws {
-        try enter(
+        // Select the textfield
+        selectField(dismissKeyboard: dismissKeyboard)
+
+        try performEnter(
             value: newValue,
             checkIfTextWasEnteredCorrectly: checkIfTextWasEnteredCorrectly,
             dismissKeyboard: dismissKeyboard,
             recursiveDepth: 0
         )
+
+        if dismissKeyboard {
+            XCUIApplication().dismissKeyboard()
+        }
     }
-    
-    
-    private func delete(
+
+
+    private func performDelete(
         count: Int,
         checkIfTextWasDeletedCorrectly: Bool,
-        dismissKeyboard: Bool,
-        // We put this parameter at the end of the function to mimic the public interface with an internal extension.
         recursiveDepth: Int
     ) throws {
         guard recursiveDepth <= 2 else {
             os_log("Could not successfully delete \(count) characters in the textfield \(self.debugDescription)")
             throw XCTestError(.failureWhileWaiting)
         }
-        
+
         // Get the current value so we can assert if the text deleted was correct.
         let currentValueCount = currentValue.count
-        
-        // Select the textfield
-        selectField(dismissKeyboard: dismissKeyboard)
 
         // Delete the text
         if simulateFlakySimulatorTextEntry && recursiveDepth < 2 {
@@ -97,31 +101,25 @@ extension XCUIElement {
         } else {
             typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: count))
         }
-        
+
         // Check of the text was deleted correctly:
         if checkIfTextWasDeletedCorrectly {
             let countAfterDeletion = currentValue.count
-            
+
             if max(currentValueCount - count, 0) < countAfterDeletion {
-                try delete(
-                    count: countAfterDeletion - (currentValueCount - count),
+                try performDelete(
+                    count: countAfterDeletion - ( currentValueCount - count),
                     checkIfTextWasDeletedCorrectly: true,
-                    dismissKeyboard: dismissKeyboard,
                     recursiveDepth: recursiveDepth + 1
                 )
             }
         }
-        
-        if dismissKeyboard {
-            XCUIApplication().dismissKeyboard()
-        }
     }
-    
-    private func enter(
+
+    private func performEnter(
         value textToEnter: String,
         checkIfTextWasEnteredCorrectly: Bool,
         dismissKeyboard: Bool,
-        // We put this parameter at the end of the function to mimic the public interface with an internal extension.
         recursiveDepth: Int
     ) throws {
         guard recursiveDepth <= 2 else {
@@ -131,10 +129,7 @@ extension XCUIElement {
         
         // Get the current value so we can assert if the text entry was correct.
         let previousValue = currentValue
-        
-        // Select the textfield
-        selectField(dismissKeyboard: dismissKeyboard)
-        
+
         // Enter the value
         if simulateFlakySimulatorTextEntry && recursiveDepth < 2 {
             typeText(String(textToEnter.dropLast(1)))
@@ -142,17 +137,18 @@ extension XCUIElement {
             typeText(textToEnter)
         }
         
-        // Check of the text was entered correctly:
+        // Check if the text was entered correctly
         if checkIfTextWasEnteredCorrectly {
             let valueAfterTextEntry = currentValue
             
             if self.elementType == .secureTextField {
                 if previousValue.isEmpty && textToEnter.count != valueAfterTextEntry.count {
-                    // We delete the text twice to ensure that we have an empty text field even if the textfield might go byeond the current scope
-                    try delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
-                    try delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
-                    
-                    try enter(
+                    // We delete the text twice to ensure that we have an empty text field even if the textfield might go beyond the current scope
+                    try performDelete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false, recursiveDepth: 0)
+                    XCUIApplication().dismissKeyboard()
+                    try delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false, dismissKeyboard: false)
+
+                    try performEnter(
                         value: previousValue + textToEnter,
                         checkIfTextWasEnteredCorrectly: true,
                         dismissKeyboard: dismissKeyboard,
@@ -169,11 +165,12 @@ extension XCUIElement {
                 }
             } else {
                 if previousValue + textToEnter != valueAfterTextEntry {
-                    // We delete the text twice to ensure that we have an empty text field even if the textfield might go byeond the current scope
-                    try delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
-                    try delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false)
-                    
-                    try enter(
+                    // We delete the text twice to ensure that we have an empty text field even if the textfield might go beyond the current scope
+                    try performDelete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false, recursiveDepth: 0)
+                    XCUIApplication().dismissKeyboard()
+                    try delete(count: valueAfterTextEntry.count, checkIfTextWasDeletedCorrectly: false, dismissKeyboard: false)
+
+                    try performEnter(
                         value: previousValue + textToEnter,
                         checkIfTextWasEnteredCorrectly: true,
                         dismissKeyboard: dismissKeyboard,
@@ -181,10 +178,6 @@ extension XCUIElement {
                     )
                 }
             }
-        }
-        
-        if dismissKeyboard {
-            XCUIApplication().dismissKeyboard()
         }
     }
     
@@ -196,17 +189,22 @@ extension XCUIElement {
     ///     This is controlled via I/O -> Keyboard -> Connect Hardware Keyboard / Toggle Software Keyboard
     func selectField(dismissKeyboard: Bool) {
         let app = XCUIApplication()
-        let keyboard = app.keyboards.firstMatch
-        
+
+        // With visionOS we can't detect if the keyboard is currently shown. Interacting with a keyboard that is not shown will fail though.
+        // So we have to build around the assumption that the keyboard is not shown when we select a text field.
+        #if !os(visionOS)
         // Press the return button if the keyboard is currently active.
         if dismissKeyboard {
             app.dismissKeyboard()
         }
+        #endif
 
         #if os(visionOS)
         tap()
-        // keyboard is not available on visionOS
+        _ = app.visionOSKeyboard.waitForExistence(timeout: 2.0) // this will always succeed
         #else
+        let keyboard = app.keyboards.firstMatch
+
         // Select the text field, see https://stackoverflow.com/questions/38523125/place-cursor-at-the-end-of-uitextview-under-uitest
         var offset = 0.99
         repeat {

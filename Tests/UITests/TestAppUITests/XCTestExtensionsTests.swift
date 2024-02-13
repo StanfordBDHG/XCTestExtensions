@@ -19,6 +19,7 @@ class XCTestExtensionsTests: XCTestCase {
 
     func testDeleteAndLaunch() throws {
         let app = XCUIApplication()
+        
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
         
         app.staticTexts["XCTestExtensions"].tap()
@@ -28,7 +29,11 @@ class XCTestExtensionsTests: XCTestCase {
     }
     
     func testDeleteAndLaunchFromFirstPage() throws {
-        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+#if os(visionOS)
+        // currently don't know how to swipe on the Reality Launcher. So not a super big use case for us now.
+        throw XCTSkip("VisionOS will typically have apps installed on the first screen anyways.")
+#endif
+        let springboard = XCUIApplication(bundleIdentifier: XCUIApplication.homeScreenBundle)
         springboard.activate()
         springboard.swipeRight()
         
@@ -91,13 +96,19 @@ class XCTestExtensionsTests: XCTestCase {
         app.staticTexts["DismissKeyboard"].tap()
         let checkLabel = { (label: String) in
             app.textFields[label].selectField(dismissKeyboard: false)
+            #if os(visionOS)
+            XCTAssert(app.visionOSKeyboard.exists)
+            #else
             XCTAssertTrue(app.keyboards.firstMatch.exists)
-            print(app.keyboards.buttons.debugDescription)
+            #endif
             sleep(1)
 
             app.dismissKeyboard()
             sleep(1)
+#if !os(visionOS)
+            // we currently can't check if the keyboard app is not launched
             XCTAssertFalse(app.keyboards.firstMatch.exists)
+#endif
         }
         
         // this way we know exactly which button failed by line numbers.
@@ -126,8 +137,8 @@ extension XCUIApplication {
         try textField.delete(count: 42)
         XCTAssert(staticTexts["No text set ..."].waitForExistence(timeout: 5))
 
-        dismissKeyboard()
         #if !os(visionOS)
+        dismissKeyboard()
         swipeUp()
         #endif
 
