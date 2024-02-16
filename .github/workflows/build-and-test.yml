@@ -42,15 +42,6 @@ jobs:
       destination: 'platform=visionOS Simulator,name=Apple Vision Pro'
       resultBundle: XCTestExtensions-visionOS.xcresult
       artifactname: XCTestExtensions-visionOS.xcresult
-  buildandtest_tvos:
-    name: Build and Test Swift Package tvOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
-    with:
-      runsonlabels: '["macOS", "self-hosted"]'
-      scheme: XCTestExtensions-Package
-      destination: 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)'
-      resultBundle: XCTestExtensions-tvOS.xcresult
-      artifactname: XCTestExtensions-tvOS.xcresult
   buildandtest_macos:
     name: Build and Test Swift Package macOS
     uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
