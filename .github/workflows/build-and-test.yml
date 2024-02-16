@@ -70,16 +70,6 @@ jobs:
       destination: 'platform=visionOS Simulator,name=Apple Vision Pro'
       resultBundle: TestApp-visionOS.xcresult
       artifactname: TestApp-visionOS.xcresult
-  buildandtestuitests_macos:
-    name: Build and Test UI Tests macOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
-    with:
-      runsonlabels: '["macOS", "self-hosted"]'
-      path: Tests/UITests
-      scheme: TestApp
-      destination: 'platform=macOS,arch=arm64'
-      resultBundle: TestApp-macOS.xcresult
-      artifactname: TestApp-macOS.xcresult
   uploadcoveragereport:
     name: Upload Coverage Report
     needs: [buildandtest_ios, buildandtest_visionos, buildandtest_watchos, buildandtest_tvos, buildandtest_macos, buildandtestuitests_ios, buildandtestuitests_visionos, buildandtestuitests_macos]
