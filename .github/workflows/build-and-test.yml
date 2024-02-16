@@ -18,7 +18,7 @@ on:
 jobs:
   buildandtest_ios:
     name: Build and Test Swift Package iOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@feature/artifact-actions-upgrade
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       runsonlabels: '["macOS", "self-hosted"]'
       scheme: XCTestExtensions-Package
@@ -26,7 +26,7 @@ jobs:
       artifactname: XCTestExtensions-iOS.xcresult
   buildandtest_watchos:
     name: Build and Test Swift Package watchOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@feature/artifact-actions-upgrade
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       runsonlabels: '["macOS", "self-hosted"]'
       scheme: XCTestExtensions-Package
@@ -35,7 +35,7 @@ jobs:
       artifactname: XCTestExtensions-watchOS.xcresult
   buildandtest_visionos:
     name: Build and Test Swift Package visionOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@feature/artifact-actions-upgrade
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       runsonlabels: '["macOS", "self-hosted"]'
       scheme: XCTestExtensions-Package
@@ -44,7 +44,7 @@ jobs:
       artifactname: XCTestExtensions-visionOS.xcresult
   buildandtest_macos:
     name: Build and Test Swift Package macOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@feature/artifact-actions-upgrade
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       runsonlabels: '["macOS", "self-hosted"]'
       scheme: XCTestExtensions-Package
@@ -53,7 +53,7 @@ jobs:
       artifactname: XCTestExtensions-macOS.xcresult
   buildandtestuitests_ios:
     name: Build and Test UI Tests iOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@feature/artifact-actions-upgrade
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       runsonlabels: '["macOS", "self-hosted"]'
       path: Tests/UITests
@@ -62,7 +62,7 @@ jobs:
       artifactname: TestApp-iOS.xcresult
   buildandtestuitests_visionos:
     name: Build and Test UI Tests visionOS
-    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@feature/artifact-actions-upgrade
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
       runsonlabels: '["macOS", "self-hosted"]'
       path: Tests/UITests
@@ -73,6 +73,6 @@ jobs:
   uploadcoveragereport:
     name: Upload Coverage Report
     needs: [buildandtest_ios, buildandtest_visionos, buildandtest_watchos, buildandtest_macos, buildandtestuitests_ios, buildandtestuitests_visionos]
-    uses: StanfordBDHG/.github/.github/workflows/create-and-upload-coverage-report.yml@feature/artifact-actions-upgrade
+    uses: StanfordBDHG/.github/.github/workflows/create-and-upload-coverage-report.yml@v2
     with:
       coveragereports: XCTestExtensions-iOS.xcresult XCTestExtensions-watchOS.xcresult XCTestExtensions-visionOS.xcresult XCTestExtensions-macOS.xcresult TestApp-iOS.xcresult TestApp-visionOS.xcresult
