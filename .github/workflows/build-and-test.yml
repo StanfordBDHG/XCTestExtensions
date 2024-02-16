@@ -73,6 +73,6 @@ jobs:
   uploadcoveragereport:
     name: Upload Coverage Report
     needs: [buildandtest_ios, buildandtest_visionos, buildandtest_watchos, buildandtest_macos, buildandtestuitests_ios, buildandtestuitests_visionos]
-    uses: StanfordBDHG/.github/.github/workflows/create-and-upload-coverage-report.yml@v2
+    uses: StanfordBDHG/.github/.github/workflows/create-and-upload-coverage-report.yml@feature/artifact-actions-upgrade
     with:
       coveragereports: XCTestExtensions-iOS.xcresult XCTestExtensions-watchOS.xcresult XCTestExtensions-visionOS.xcresult XCTestExtensions-macOS.xcresult TestApp-iOS.xcresult TestApp-visionOS.xcresult
