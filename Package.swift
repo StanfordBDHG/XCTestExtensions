@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
 //
 // This source file is part of the Stanford XCTestExtensions open-source project
@@ -14,7 +14,10 @@ import PackageDescription
 let package = Package(
     name: "XCTestExtensions",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v16),
+        .watchOS(.v9),
+        .visionOS(.v1),
+        .macOS(.v13)
     ],
     products: [
         .library(name: "XCTestApp", targets: ["XCTestApp"]),

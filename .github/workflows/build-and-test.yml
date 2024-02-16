@@ -16,24 +16,63 @@ on:
   workflow_dispatch:
 
 jobs:
-  buildandtest:
-    name: Build and Test Swift Package
+  buildandtest_ios:
+    name: Build and Test Swift Package iOS
     uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
-      artifactname: XCTestExtensions-Package.xcresult
       runsonlabels: '["macOS", "self-hosted"]'
       scheme: XCTestExtensions-Package
-  buildandtestuitests:
-    name: Build and Test UI Tests
+      resultBundle: XCTestExtensions-iOS.xcresult
+      artifactname: XCTestExtensions-iOS.xcresult
+  buildandtest_watchos:
+    name: Build and Test Swift Package watchOS
     uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
     with:
-      artifactname: TestApp.xcresult
+      runsonlabels: '["macOS", "self-hosted"]'
+      scheme: XCTestExtensions-Package
+      destination: 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)'
+      resultBundle: XCTestExtensions-watchOS.xcresult
+      artifactname: XCTestExtensions-watchOS.xcresult
+  buildandtest_visionos:
+    name: Build and Test Swift Package visionOS
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
+    with:
+      runsonlabels: '["macOS", "self-hosted"]'
+      scheme: XCTestExtensions-Package
+      destination: 'platform=visionOS Simulator,name=Apple Vision Pro'
+      resultBundle: XCTestExtensions-visionOS.xcresult
+      artifactname: XCTestExtensions-visionOS.xcresult
+  buildandtest_macos:
+    name: Build and Test Swift Package macOS
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
+    with:
+      runsonlabels: '["macOS", "self-hosted"]'
+      scheme: XCTestExtensions-Package
+      destination: 'platform=macOS,arch=arm64'
+      resultBundle: XCTestExtensions-macOS.xcresult
+      artifactname: XCTestExtensions-macOS.xcresult
+  buildandtestuitests_ios:
+    name: Build and Test UI Tests iOS
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
+    with:
       runsonlabels: '["macOS", "self-hosted"]'
       path: Tests/UITests
       scheme: TestApp
+      resultBundle: TestApp-iOS.xcresult
+      artifactname: TestApp-iOS.xcresult
+  buildandtestuitests_visionos:
+    name: Build and Test UI Tests visionOS
+    uses: StanfordBDHG/.github/.github/workflows/xcodebuild-or-fastlane.yml@v2
+    with:
+      runsonlabels: '["macOS", "self-hosted"]'
+      path: Tests/UITests
+      scheme: TestApp
+      destination: 'platform=visionOS Simulator,name=Apple Vision Pro'
+      resultBundle: TestApp-visionOS.xcresult
+      artifactname: TestApp-visionOS.xcresult
   uploadcoveragereport:
     name: Upload Coverage Report
-    needs: [buildandtest, buildandtestuitests]
+    needs: [buildandtest_ios, buildandtest_visionos, buildandtest_watchos, buildandtest_macos, buildandtestuitests_ios, buildandtestuitests_visionos]
     uses: StanfordBDHG/.github/.github/workflows/create-and-upload-coverage-report.yml@v2
     with:
-      coveragereports: XCTestExtensions-Package.xcresult TestApp.xcresult
+      coveragereports: XCTestExtensions-iOS.xcresult XCTestExtensions-watchOS.xcresult XCTestExtensions-visionOS.xcresult XCTestExtensions-macOS.xcresult TestApp-iOS.xcresult TestApp-visionOS.xcresult
