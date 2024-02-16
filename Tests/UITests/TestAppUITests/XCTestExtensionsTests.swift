@@ -28,8 +28,9 @@ class XCTestExtensionsTests: XCTestCase {
         
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
         
-        app.staticTexts["XCTestExtensions"].tap()
-        
+        XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
+        app.buttons["XCTestExtensions"].tap()
+
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
         XCTAssert(app.staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
     }
@@ -51,8 +52,9 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
         
-        app.staticTexts["XCTestExtensions"].tap()
-        
+        XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
+        app.buttons["XCTestExtensions"].tap()
+
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
         XCTAssert(app.staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
     }
@@ -67,6 +69,7 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
         
+        XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
         app.buttons["XCTestExtensions"].tap()
 
         try app.callTextEntryExtensions()
@@ -76,6 +79,7 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
         
+        XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
         app.buttons["XCTestExtensions"].tap()
 
         simulateFlakySimulatorTextEntry = true
@@ -87,6 +91,7 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
+        XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
         app.buttons["XCTestExtensions"].tap()
 
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
@@ -104,6 +109,7 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
+        XCTAssert(app.buttons["DismissKeyboard"].waitForExistence(timeout: 5.0))
         app.buttons["DismissKeyboard"].tap()
         let checkLabel = { (label: String) in
             XCTAssert(app.textFields[label].exists)
