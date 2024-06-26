@@ -11,7 +11,7 @@ import XCTestExtensions
 
 
 final class XCTestExtensionsTests: XCTestCase {
-    func testXCTestExtensions() throws {
-        XCTAssert(true)
+    func testXCTAssertThrowsPositive() async throws {
+        try await XCTAssertThrowsErrorAsync(await Task.sleep(for: .milliseconds(100)))
     }
 }
