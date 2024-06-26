@@ -20,7 +20,15 @@ extension XCTestCase {
     ///
     /// > Warning: While this workaround worked well until 17.2, we experienced a crash of the passwords section in the IOS 17.2 passwords app on the iOS simulator, which no longer allows us to use this workaround.
     /// We recommend using a custom setup script to skip password-related functionality in your UI tests until there is a better workaround. Please inspect the logic to setup simulators in the [xcodebuild-or-fastlane.yml](https://github.com/StanfordBDHG/.github/blob/main/.github/workflows/xcodebuild-or-fastlane.yml) workflow and be sure to `setupSimulators: true` if you use the GitHub action as a reusable workflow.
-    @available(iOS, deprecated: 17.2, message: "Please use a custom setup script in your CI environment to disable password autofill.")
+    @available(
+        iOS,
+        deprecated: 17.2,
+        message: """
+                 To avoid having the password autofill interfere with your UI test, \
+                 avoid specifying the password text content type for simulator builds.
+                 This method will be removed in a future version.
+                 """
+    )
     @available(watchOS, unavailable)
     @available(macOS, unavailable)
     @available(tvOS, unavailable)

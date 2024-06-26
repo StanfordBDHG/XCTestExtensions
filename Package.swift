@@ -11,6 +11,13 @@
 import PackageDescription
 
 
+#if swift(<6)
+let swiftConcurrency: SwiftSetting = .enableExperimentalFeature("SwiftConcurrency")
+#else
+let swiftConcurrency: SwiftSetting = .enableUpcomingFeature("SwiftConcurrency")
+#endif
+
+
 let package = Package(
     name: "XCTestExtensions",
     platforms: [
@@ -25,15 +32,24 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "XCTestApp"
+            name: "XCTestApp",
+            swiftSettings: [
+                swiftConcurrency
+            ]
         ),
         .target(
-            name: "XCTestExtensions"
+            name: "XCTestExtensions",
+            swiftSettings: [
+                swiftConcurrency
+            ]
         ),
         .testTarget(
             name: "XCTestExtensionsTests",
             dependencies: [
                 .target(name: "XCTestExtensions")
+            ],
+            swiftSettings: [
+                swiftConcurrency
             ]
         )
     ]
