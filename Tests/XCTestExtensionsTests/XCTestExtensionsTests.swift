@@ -12,6 +12,6 @@ import XCTestExtensions
 
 final class XCTestExtensionsTests: XCTestCase {
     func testXCTAssertThrowsPositive() async throws {
-        try await XCTAssertThrowsErrorAsync(await Task.sleep(for: .milliseconds(100)))
+        try await XCTAssertThrowsErrorAsync({ throw CancellationError() }())
     }
 }
