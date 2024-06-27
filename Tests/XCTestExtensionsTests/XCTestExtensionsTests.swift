@@ -12,6 +12,8 @@ import XCTestExtensions
 
 final class XCTestExtensionsTests: XCTestCase {
     func testXCTAssertThrowsPositive() async throws {
-        try await XCTAssertThrowsErrorAsync({ throw CancellationError() }())
+        try await XCTAssertThrowsErrorAsync({ throw CancellationError() }()) { error in
+            _ = try XCTUnwrap(error as? CancellationError)
+        }
     }
 }

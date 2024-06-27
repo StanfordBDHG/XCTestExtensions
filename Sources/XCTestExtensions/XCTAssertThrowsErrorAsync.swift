@@ -24,12 +24,12 @@ public func XCTAssertThrowsErrorAsync<T>(
     _ message: @autoclosure () -> String = "",
     file: StaticString = #filePath,
     line: UInt = #line,
-    _ errorHandler: (Error) -> Void = { _ in }
-) async {
+    _ errorHandler: (Error) throws -> Void = { _ in }
+) async rethrows {
     do {
         _ = try await expression()
         XCTFail(message(), file: file, line: line)
     } catch {
-        errorHandler(error)
+        try errorHandler(error)
     }
 }
