@@ -64,7 +64,7 @@ extension XCTestCase {
             passcodeInput.typeText("1234\r")
             
             sleep(2)
-        } else if #unavailable(iOS 17.4, *) {
+        } else if #unavailable(iOS 17.4) {
             // other versions just don't need a passcode anymore
             os_log("Could not enter the passcode in the device to enter the password section in the settings app.")
             throw XCTestError(.failureWhileWaiting)
