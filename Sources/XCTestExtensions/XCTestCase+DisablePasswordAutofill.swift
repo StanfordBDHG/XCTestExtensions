@@ -53,7 +53,9 @@ extension XCTestCase {
         }
         
         let springboard = XCUIApplication(bundleIdentifier: XCUIApplication.homeScreenBundle)
-        if springboard.secureTextFields["Passcode field"].waitForExistence(timeout: 30.0) {
+
+        sleep(1)
+        if springboard.secureTextFields["Passcode field"].exists {
             let passcodeInput = springboard.secureTextFields["Passcode field"]
             passcodeInput.tap()
             
@@ -62,7 +64,8 @@ extension XCTestCase {
             passcodeInput.typeText("1234\r")
             
             sleep(2)
-        } else {
+        } else if #unavailable(iOS 17.4, *) {
+            // other versions just don't need a passcode anymore
             os_log("Could not enter the passcode in the device to enter the password section in the settings app.")
             throw XCTestError(.failureWhileWaiting)
         }
