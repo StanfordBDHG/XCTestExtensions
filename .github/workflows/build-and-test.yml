@@ -76,3 +76,5 @@ jobs:
     uses: StanfordBDHG/.github/.github/workflows/create-and-upload-coverage-report.yml@v2
     with:
       coveragereports: XCTestExtensions-iOS.xcresult XCTestExtensions-watchOS.xcresult XCTestExtensions-visionOS.xcresult XCTestExtensions-macOS.xcresult TestApp-iOS.xcresult TestApp-visionOS.xcresult
+    secrets:
+      token: ${{ secrets.CODECOV_TOKEN }}
