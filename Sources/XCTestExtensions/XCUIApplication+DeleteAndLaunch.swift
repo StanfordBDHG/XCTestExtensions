@@ -26,6 +26,18 @@ extension XCUIApplication {
         preconditionFailure("Unsupported platform.")
 #endif
     }
+    
+    private static var visionOS2: Bool {
+        #if os(visionOS)
+        if #available(visionOS 2.0, *) {
+            true
+        } else {
+            false
+        }
+        #else
+        false
+        #endif
+    }
 
     /// Deletes the application from the iOS springboard (iOS home screen) and launches it after it has been deleted and reinstalled.
     /// - Parameter appName: The name of the application as displayed on the springboard (iOS home screen).
@@ -49,7 +61,7 @@ extension XCUIApplication {
             XCTAssertTrue(springboard.icons[appName].firstMatch.isHittable)
             springboard.icons[appName].firstMatch.press(forDuration: 1.75)
             
-            if #available(visionOS 2.0, *) {
+            if XCUIApplication.visionOS2 {
                 // VisionOS 2.0 changed the behavior how apps are deleted, showing a delete button above the app icon.
                 sleep(5)
                 let deleteButtons = springboard.collectionViews.buttons.matching(identifier: "Delete")
