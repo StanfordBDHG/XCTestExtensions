@@ -25,14 +25,13 @@ class XCTestExtensionsTests: XCTestCase {
 #endif
 
         let app = XCUIApplication()
-        
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
         
         XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
         app.buttons["XCTestExtensions"].tap()
 
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
-        XCTAssert(app.staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
+        XCTAssert(app.staticTexts["No secure text set ..."].exists)
     }
 
     @available(macOS, unavailable)
@@ -56,14 +55,7 @@ class XCTestExtensionsTests: XCTestCase {
         app.buttons["XCTestExtensions"].tap()
 
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
-        XCTAssert(app.staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
-    }
-    
-    @MainActor
-    func testDisablePasswordAutofill() throws {
-        #if os(iOS)
-        try disablePasswordAutofill()
-        #endif
+        XCTAssert(app.staticTexts["No secure text set ..."].exists)
     }
     
     func testTextEntry() throws {
@@ -100,9 +92,13 @@ class XCTestExtensionsTests: XCTestCase {
         let textField = app.textFields["TextField"]
 
         let message = "This is a very long text and some more"
-        try textField.enter(value: message, checkIfTextWasEnteredCorrectly: false)
+        try textField.enter(value: message, options: .skipTextInputValidation)
         XCTAssert(app.staticTexts[message].waitForExistence(timeout: 5))
-        try textField.enter(value: " ...", checkIfTextWasEnteredCorrectly: false)
+#if os(visionOS)
+        try textField.enter(value: " ...", options: [.skipTextInputValidation])
+#else
+        try textField.enter(value: " ...", options: [.skipTextInputValidation, .tapFromRight])
+#endif
         XCTAssert(app.staticTexts["\(message) ..."].waitForExistence(timeout: 5))
     }
 
@@ -115,21 +111,22 @@ class XCTestExtensionsTests: XCTestCase {
         app.buttons["DismissKeyboard"].tap()
         let checkLabel = { (label: String) in
             XCTAssert(app.textFields[label].exists)
-            app.textFields[label].selectField(dismissKeyboard: false)
+            app.textFields[label].selectField()
             #if os(visionOS)
-            XCTAssert(app.visionOSKeyboard.exists)
+            XCTAssert(app.visionOSKeyboard.wait(for: .runningForeground, timeout: 2.0))
             #elseif !os(macOS)
-            print(app.textFields[label].isSelected)
-            XCTAssertTrue(app.keyboards.firstMatch.exists)
+            XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 2.0))
             #endif
-            sleep(1)
 
             app.dismissKeyboard()
-            sleep(1)
 #if !os(visionOS) && !os(macOS)
-            // we currently can't check if the keyboard app is not launched
+#if compiler(<6)
+            sleep(1)
             XCTAssertFalse(app.keyboards.firstMatch.exists)
-#endif
+#else // compiler(<6)
+            XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 2.0))
+#endif // compiler(<6)
+#endif // !os(visionOS) && !os(macOS)
         }
         
         // this way we know exactly which button failed by line numbers.
