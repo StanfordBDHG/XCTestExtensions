@@ -100,6 +100,9 @@ class XCTestExtensionsTests: XCTestCase {
         try textField.enter(value: " ...", options: [.skipTextInputValidation, .tapFromRight])
 #endif
         XCTAssert(app.staticTexts["\(message) ..."].waitForExistence(timeout: 5))
+
+        // Test text field deletion with longer text input
+        try textField.delete(count: message.count + 4)
     }
 
     func testKeyboardBehavior() throws {
@@ -170,6 +173,6 @@ extension XCUIApplication {
         try secureTextField.delete(count: 42)
         XCTAssert(staticTexts["No secure text set ..."].waitForExistence(timeout: 5))
 
-        XCTAssertFalse(staticTexts["Button was pressed!"].waitForExistence(timeout: 5.0))
+        XCTAssertFalse(staticTexts["Button was pressed!"].exists)
     }
 }
