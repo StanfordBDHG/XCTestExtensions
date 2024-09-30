@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.0
 
 //
 // This source file is part of the Stanford XCTestExtensions open-source project
@@ -8,14 +8,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+import class Foundation.ProcessInfo
 import PackageDescription
-
-
-#if swift(<6)
-let swiftConcurrency: SwiftSetting = .enableExperimentalFeature("StrictConcurrency")
-#else
-let swiftConcurrency: SwiftSetting = .enableUpcomingFeature("StrictConcurrency")
-#endif
 
 
 let package = Package(
@@ -30,27 +24,40 @@ let package = Package(
         .library(name: "XCTestApp", targets: ["XCTestApp"]),
         .library(name: "XCTestExtensions", targets: ["XCTestExtensions"])
     ],
+    dependencies: [] + swiftLintPackage(),
     targets: [
         .target(
             name: "XCTestApp",
-            swiftSettings: [
-                swiftConcurrency
-            ]
+            plugins: [] + swiftLintPlugin()
         ),
         .target(
             name: "XCTestExtensions",
-            swiftSettings: [
-                swiftConcurrency
-            ]
+            plugins: [] + swiftLintPlugin()
         ),
         .testTarget(
             name: "XCTestExtensionsTests",
             dependencies: [
                 .target(name: "XCTestExtensions")
             ],
-            swiftSettings: [
-                swiftConcurrency
-            ]
+            plugins: [] + swiftLintPlugin()
         )
     ]
 )
+
+
+func swiftLintPlugin() -> [Target.PluginUsage] {
+    // Fully quit Xcode and open again with `open --env SPEZI_DEVELOPMENT_SWIFTLINT /Applications/Xcode.app`
+    if ProcessInfo.processInfo.environment["SPEZI_DEVELOPMENT_SWIFTLINT"] != nil {
+        [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLint")]
+    } else {
+        []
+    }
+}
+
+func swiftLintPackage() -> [PackageDescription.Package.Dependency] {
+    if ProcessInfo.processInfo.environment["SPEZI_DEVELOPMENT_SWIFTLINT"] != nil {
+        [.package(url: "https://github.com/realm/SwiftLint.git", from: "0.55.1")]
+    } else {
+        []
+    }
+}
