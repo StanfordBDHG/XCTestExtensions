@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-import SwiftUI
 import HealthKit
+import SwiftUI
 
 
 private let healthStore = HKHealthStore()
@@ -45,6 +45,8 @@ struct HealthKitDataEntryView: View {
             case .sharingAuthorized:
                 hasAccess = true
             case .notDetermined, .sharingDenied: // sharingDenied will never happen in the test environment.
+                hasAccess = false
+            @unknown default:
                 hasAccess = false
             }
         }
