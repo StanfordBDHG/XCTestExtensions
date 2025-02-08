@@ -74,7 +74,7 @@ struct XCTestAppTestCaseTest: TestAppTestCase {
     
     
     func testAssertNotNil() async throws {
-        try XCTAssertNotNil(Optional<Int>.some(52))
+        try XCTAssertNotNil(52)
         try assertThrows {
             try XCTAssertNotNil(Optional<Void>.none)
         }
@@ -92,9 +92,9 @@ struct XCTestAppTestCaseTest: TestAppTestCase {
     
     func testNoThrow() throws {
         struct FakeError: Error {}
-        try XCTAssertNoThrow({ () throws -> Void in }())
+        try XCTAssertNoThrow({ () throws in }())
         try assertThrows {
-            try XCTAssertNoThrow({ () throws -> Void in
+            try XCTAssertNoThrow({ () throws in
                 throw FakeError()
             }())
         }
