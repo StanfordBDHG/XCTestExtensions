@@ -18,6 +18,7 @@ struct XCTestAppTestCaseTest: TestAppTestCase {
         try await testAssertNil()
         try await testAssertNotNil()
         try testAssertUnwrap()
+        try testNoThrow()
     }
     
     
@@ -85,6 +86,17 @@ struct XCTestAppTestCaseTest: TestAppTestCase {
         print(try XCTUnwrap(42))
         try assertThrows {
             _ = try XCTUnwrap(Optional<Int>.none)
+        }
+    }
+    
+    
+    func testNoThrow() throws {
+        struct FakeError: Error {}
+        try XCTAssertNoThrow({ () throws -> Void in }())
+        try assertThrows {
+            try XCTAssertNoThrow({ () throws -> Void in
+                throw FakeError()
+            }())
         }
     }
 }

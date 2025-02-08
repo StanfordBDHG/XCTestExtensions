@@ -202,3 +202,26 @@ public func XCTUnwrap<O>(
     }
     return unwrapped
 }
+
+
+/// Asserts that an expression doesn’t throw an error.
+///
+/// This function generates a failure when the expression does throw an error.
+/// - Parameters:
+///   - optional: An expression that can throw an error.
+///   - message: An optional description of a failure.
+///   - file: The file where the failure occurs. The default is the filename of the test case where you call this function.
+///   - line: The line number where the failure occurs. The default is the line number where you call this function.
+/// - Throws: This function throws an ``XCTestFailure`` failure when `expression` throws an error.
+public func XCTAssertNoThrow(
+    _ expression: @autoclosure () throws -> some Any,
+    _ message: @autoclosure () -> String = "",
+    file: StaticString = #filePath,
+    line: UInt = #line
+) throws {
+    do {
+        _ = try expression()
+    } catch {
+        throw XCTestFailure(message: message(), file: file, line: line)
+    }
+}
