@@ -267,7 +267,11 @@ public func XCTAssertNoThrow(
 
 // MARK: Utilities
 
-private func formatFailureMessage(_ caller: String = #function, baseText: String, additionalMessage: String) -> String {
+private func formatFailureMessage(
+    _ caller: String = #function, // swiftlint:disable:this function_default_parameter_at_end
+    baseText: String,
+    additionalMessage: String
+) -> String {
     let caller = caller.firstIndex(of: "(").map { caller[caller.startIndex..<$0] } ?? caller[...]
     var msg = "\(caller) failed"
     if !baseText.isEmpty {
