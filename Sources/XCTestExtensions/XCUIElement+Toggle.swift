@@ -54,7 +54,7 @@ extension XCUIElement {
     
     
     /// Updates a toggle or switch element to the specified value.
-    public func setToggleValue(isOn newState: Bool) throws {
+    public func setToggleState(isOn newState: Bool) throws {
         guard let toggleState else {
             throw NSError(domain: "edu.stanford.SpezOnboarding.UITests", code: 0, userInfo: [
                 NSLocalizedDescriptionKey: "Unable to determine current value: '\(String(describing: value))'"
