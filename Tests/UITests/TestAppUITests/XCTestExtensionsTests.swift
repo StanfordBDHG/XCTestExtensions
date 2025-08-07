@@ -189,7 +189,7 @@ class XCTestExtensionsTests: XCTestCase {
         
         func assertToggleState(_ expectedState: Bool, line: UInt = #line) {
             XCTAssert(app.staticTexts["Selection Value, \(expectedState)"].waitForExistence(timeout: 1))
-            XCTAssert(toggle.toggleState == expectedState)
+            XCTAssertEqual(toggle.toggleState, expectedState)
         }
         
         assertToggleState(false)
