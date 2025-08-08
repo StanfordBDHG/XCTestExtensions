@@ -12,7 +12,7 @@ import XCTest
 extension XCUIElement {
     /// Determines the current selection value of a toggle or switch element.
     public var toggleState: Bool? { // swiftlint:disable:this discouraged_optional_boolean
-        guard elementType == .switch || elementType == .toggle else {
+        guard [XCUIElement.ElementType.switch, .toggle].contains(elementType) else {
             return nil
         }
         return switch value as? String {
