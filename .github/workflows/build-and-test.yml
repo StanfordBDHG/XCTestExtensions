@@ -30,7 +30,7 @@ jobs:
     with:
       runsonlabels: '["macOS", "self-hosted"]'
       scheme: XCTestExtensions-Package
-      destination: 'platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)'
+      destination: 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)'
       resultBundle: XCTestExtensions-watchOS.xcresult
       artifactname: XCTestExtensions-watchOS.xcresult
   buildandtest_visionos:
