@@ -9,9 +9,10 @@
 import func unistd.usleep
 
 
-/// Sleeps for the specified duration.
+/// Suspends execution for the specified duration.
 ///
-/// - Note: This exists as a synchronous alternative to `Task.sleep(for:)`, since implementing UI tests as async functions can cause issues with XCTest.
+/// - Note: This exists as a synchronous alternative to [`Task.sleep(for:)`](https://developer.apple.com/documentation/swift/task/sleep(_:)),
+///     in order to work around a bug in XCTest, where `async` UI test functions will sometimes hang at their suspension points.
 public func sleep(for duration: Duration) {
     usleep(UInt32(duration.timeInterval * 1000000))
 }
@@ -19,6 +20,8 @@ public func sleep(for duration: Duration) {
 
 extension Duration {
     /// The number of seconds in the `Duration`, as a `TimeInterval` value.
+    ///
+    /// - Note: Copied from SpeziFoundation, so that we don't need to add that as a dependency.
     fileprivate var timeInterval: Double {
         let components = self.components
         let attosecondsInSeconds = Double(components.attoseconds) / 1_000_000_000_000_000_000.0 // 10^-18
