@@ -27,8 +27,8 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
         
-        XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
-        app.buttons["XCTestExtensions"].tap()
+        XCTAssert(app.buttons["Text Entry"].waitForExistence(timeout: 5.0))
+        app.buttons["Text Entry"].tap()
 
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
         XCTAssert(app.staticTexts["No secure text set ..."].exists)
@@ -83,8 +83,8 @@ class XCTestExtensionsTests: XCTestCase {
         let app = XCUIApplication()
         app.deleteAndLaunch(withSpringboardAppName: "TestApp")
         
-        XCTAssert(app.buttons["XCTestExtensions"].waitForExistence(timeout: 5.0))
-        app.buttons["XCTestExtensions"].tap()
+        XCTAssert(app.buttons["Text Entry"].waitForExistence(timeout: 5.0))
+        app.buttons["Text Entry"].tap()
 
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))
         XCTAssert(app.staticTexts["No secure text set ..."].exists)
