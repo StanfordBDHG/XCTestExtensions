@@ -45,7 +45,7 @@ final class TextEntryTests: XCTestCase {
         try textField.enter(value: "Example Text")
         XCTAssert(app.staticTexts["Example Text"].waitForExistence(timeout: 5))
         try textField.delete(count: 5)
-        XCTAssert(app.staticTexts["Example "].waitForExistence(timeout: 5))
+        XCTAssert(app.staticTexts[simulateFlakyKeyboard ? "Example " : "Example"].waitForExistence(timeout: 5))
         
         try textField.delete(count: 42)
         XCTAssert(app.staticTexts["No text set ..."].waitForExistence(timeout: 5))

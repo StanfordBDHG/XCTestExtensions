@@ -115,8 +115,10 @@ extension XCUIElement {
         if !options.contains(.skipTextFieldSelection) {
             try selectTextField(options: options)
         }
+        #if !os(watchOS)
         // we want to delete everything, so move the cursor all the way to the right
         typeKey(XCUIKeyboardKey.rightArrow, modifierFlags: .command)
+        #endif
         try performDelete(count: textFieldValue.count, options: options)
         if !options.contains(.skipTextInputValidation) {
             XCTAssertEqual(textFieldValue, "", "Somehow failed to delete all text in \(self.debugDescription)")
@@ -236,8 +238,10 @@ extension XCUIElement {
                 offset -= 0.05
             } while offset >= 0 && !app.keyboards.firstMatch.waitForExistence(timeout: 2.0)
             XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 2.0), "Keyboard does not exist.")
+            #if !os(watchOS)
             // move the cursor all the way to the right
             typeKey(XCUIKeyboardKey.rightArrow, modifierFlags: .command)
+            #endif
         } else {
             tap()
             #if os(visionOS)
