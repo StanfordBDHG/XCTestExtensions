@@ -116,7 +116,7 @@ extension XCUIElement {
             try selectTextField(options: options)
         }
         // we want to delete everything, so move the cursor all the way to the right
-        typeKey(XCUIKeyboardKey.rightArrow.rawValue, modifierFlags: .command)
+        typeKey(XCUIKeyboardKey.rightArrow, modifierFlags: .command)
         try performDelete(count: textFieldValue.count, options: options)
         if !options.contains(.skipTextInputValidation) {
             XCTAssertEqual(textFieldValue, "", "Somehow failed to delete all text in \(self.debugDescription)")
@@ -237,7 +237,7 @@ extension XCUIElement {
             } while offset >= 0 && !app.keyboards.firstMatch.waitForExistence(timeout: 2.0)
             XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 2.0), "Keyboard does not exist.")
             // move the cursor all the way to the right
-            typeKey(XCUIKeyboardKey.rightArrow.rawValue, modifierFlags: .command)
+            typeKey(XCUIKeyboardKey.rightArrow, modifierFlags: .command)
         } else {
             tap()
             #if os(visionOS)
