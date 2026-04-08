@@ -28,9 +28,15 @@ private enum SubmitLabels: String, CaseIterable {
 extension XCUIApplication {
     /// Dismisses the keyboard if it is currently displayed.
     public func dismissKeyboard() {
-        #if os(macOS)
-        return // we cannot dismiss a keyboard in macOS
-        #elseif os(visionOS)
+        // we cannot dismiss a keyboard in macOS
+        #if !os(macOS)
+        _dismissKeyboard(allowRecursion: true)
+        #endif
+    }
+    
+    #if !os(macOS)
+    private func _dismissKeyboard(allowRecursion: Bool) {
+        #if os(visionOS)
         let keyboard = visionOSKeyboard
         #else
         let keyboard = keyboards.firstMatch
@@ -55,15 +61,16 @@ extension XCUIApplication {
             // the "return" key is usually the last button on the keyboard.
             returnKey.tap()
         } else {
-            if UIDevice.current.userInterfaceIdiom == .pad, let textField = self.focusedTextField {
+            if allowRecursion, UIDevice.current.userInterfaceIdiom == .pad, let textField = self.focusedTextField {
                 let dismissRegion = self.otherElements["PopoverDismissRegion"]
                 if dismissRegion.exists && self.popovers.keys.firstMatch.exists {
                     textField.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
                 }
-                dismissKeyboard()
+                _dismissKeyboard(allowRecursion: false)
             }
         }
     }
+    #endif
 }
 
 
