@@ -61,6 +61,7 @@ extension XCUIApplication {
             // the "return" key is usually the last button on the keyboard.
             returnKey.tap()
         } else {
+            #if os(iOS)
             if allowRecursion, UIDevice.current.userInterfaceIdiom == .pad, let textField = self.focusedTextField {
                 let dismissRegion = self.otherElements["PopoverDismissRegion"]
                 if dismissRegion.exists && self.popovers.keys.firstMatch.exists {
@@ -68,6 +69,7 @@ extension XCUIApplication {
                 }
                 _dismissKeyboard(allowRecursion: false)
             }
+            #endif
         }
     }
     #endif
