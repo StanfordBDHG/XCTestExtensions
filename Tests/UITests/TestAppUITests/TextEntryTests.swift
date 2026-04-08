@@ -150,9 +150,12 @@ final class TextEntryTests: XCTestCase {
     
     @MainActor
     func testNumberPadDismissal() throws {
-        #if os(visionOS)
-        throw XCTSkip("Not supported")
-        #endif
+        guard UIDevice.current.userInterfaceIdiom == .pad else {
+            // iPhoneOS number pads don't have a universal dismissal mechanism, bc there is no submit/return button.
+            // depending on the specific configuration of the view being presented, there might be some kind of
+            // ScrollView-based (interactive) dismissal situation going on, but nothing that can be relied upon reliably.
+            throw XCTSkip("Not applicable")
+        }
         app.buttons["DismissKeyboard"].tap()
         let textField = app.textFields["Number Entry"]
         XCTAssert(textField.waitForExistence(timeout: 2))
