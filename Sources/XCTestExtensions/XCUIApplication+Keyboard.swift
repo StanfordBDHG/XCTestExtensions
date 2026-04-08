@@ -28,36 +28,58 @@ private enum SubmitLabels: String, CaseIterable {
 extension XCUIApplication {
     /// Dismisses the keyboard if it is currently displayed.
     public func dismissKeyboard() {
-        #if os(visionOS)
+        #if os(macOS)
+        return // we cannot dismiss a keyboard in macOS
+        #elseif os(visionOS)
         let keyboard = visionOSKeyboard
         #else
         let keyboard = keyboards.firstMatch
         #endif
-
-        #if os(macOS)
-        return // we cannot dismiss a keyboard in macOS
-        #endif
-
+        
         // on vision os this check always succeed. So dismissing a keyboard in visionOS when it isn't launched is a problem!
         guard keyboard.exists else {
             return
         }
-
+        
         for label in SubmitLabels.allCases {
             guard keyboard.buttons[label.rawValue].exists && keyboard.buttons[label.rawValue].isHittable else {
                 continue
             }
-
             keyboard.buttons[label.rawValue].tap()
             return
         }
-
         // If we reach here, we weren't successful with our built list of submit labels.
         // Falling back to doing it by heuristic.
         if let returnKey = keyboard.buttons.allElementsBoundByIndex.last,
            returnKey.isHittable {
             // the "return" key is usually the last button on the keyboard.
             returnKey.tap()
+        } else {
+            if UIDevice.current.userInterfaceIdiom == .pad, let textField = self.focusedTextField {
+                let dismissRegion = self.otherElements["PopoverDismissRegion"]
+                if dismissRegion.exists && self.popovers.keys.firstMatch.exists {
+                    textField.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+                }
+                dismissKeyboard()
+            }
         }
+    }
+}
+
+
+extension XCUIApplication {
+    /// The textField that currently is first responder
+    var focusedTextField: XCUIElement? {
+        let predicate = NSPredicate(format: "hasKeyboardFocus == YES")
+        let field = textFields.element(matching: predicate)
+        if field.exists {
+            return field
+        }
+        let secure = secureTextFields.element(matching: predicate)
+        if secure.exists {
+            return secure
+        }
+        let view = textViews.element(matching: predicate)
+        return view.exists ? view : nil
     }
 }
