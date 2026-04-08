@@ -150,6 +150,9 @@ final class TextEntryTests: XCTestCase {
     
     @MainActor
     func testNumberPadDismissal() throws {
+        #if os(visionOS)
+        throw XCTSkip("Not supported")
+        #endif
         app.buttons["DismissKeyboard"].tap()
         let textField = app.textFields["Number Entry"]
         XCTAssert(textField.waitForExistence(timeout: 2))
