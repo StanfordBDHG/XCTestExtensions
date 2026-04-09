@@ -93,7 +93,6 @@ extension XCUIApplication {
                         XCTAssert(springboard.wait(for: .runningForeground, timeout: 2.0))
                         XCTAssert(homeScreenIcons[appName].firstMatch.isHittable)
                         homeScreenIcons[appName].firstMatch.press(forDuration: 1.75)
-                        XCTAssert(springboard.collectionViews.buttons["Remove App"].waitForExistence(timeout: 5))
                     }
                     if springboard.collectionViews.buttons["Options"].exists {
                         // We long-pressed the app icon, and the "Remove App" button isn't showing up, but an "Options" button is.
