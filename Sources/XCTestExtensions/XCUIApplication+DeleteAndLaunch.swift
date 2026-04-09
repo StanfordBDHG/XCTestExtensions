@@ -16,27 +16,27 @@ extension XCUIApplication {
     @available(macOS, unavailable)
     @available(watchOS, unavailable)
     public static var homeScreenBundle: String {
-#if os(visionOS)
+        #if os(visionOS)
         "com.apple.RealityLauncher"
-#elseif os(tvOS)
+        #elseif os(tvOS)
         "com.apple.pineboard"
-#elseif os(iOS)
+        #elseif os(iOS)
         "com.apple.springboard"
-#else
+        #else
         preconditionFailure("Unsupported platform.")
-#endif
+        #endif
     }
     
     private static var visionOS2: Bool {
-#if os(visionOS)
+        #if os(visionOS)
         if #available(visionOS 2.0, *) {
             true
         } else {
             false
         }
-#else
+        #else
         false
-#endif
+        #endif
     }
 
     /// Deletes the application from the iOS springboard (iOS home screen) and launches it after it has been deleted and reinstalled.
@@ -73,7 +73,7 @@ extension XCUIApplication {
                 springboard.swipeLeft()
             }
 
-            XCTAssertTrue(homeScreenIcons[appName].firstMatch.isHittable)
+            XCTAssert(homeScreenIcons[appName].firstMatch.isHittable)
             #if os(visionOS)
             homeScreenIcons[appName].firstMatch.press(forDuration: 1)
             #else
@@ -83,9 +83,9 @@ extension XCUIApplication {
             if XCUIApplication.visionOS2 {
                 // VisionOS 2.0 changed the behavior how apps are deleted, showing a delete button above the app icon.
                 let deleteButton = homeScreenIcons[appName].buttons["Delete"]
-                XCTAssertTrue(deleteButton.waitForExistence(timeout: 5.0))
+                XCTAssert(deleteButton.waitForExistence(timeout: 5.0))
                 deleteButton.tap()
-            } else {
+            } else { // iPhone / iPad / visionOS 1
                 if !springboard.collectionViews.buttons["Remove App"].waitForExistence(timeout: 5) {
                     if springboard.state != .runningForeground {
                         // The long press did not work, let's launch the springboard again and then try long pressing the app icon again.
@@ -94,15 +94,14 @@ extension XCUIApplication {
                         XCTAssert(homeScreenIcons[appName].firstMatch.isHittable)
                         homeScreenIcons[appName].firstMatch.press(forDuration: 1.75)
                         XCTAssert(springboard.collectionViews.buttons["Remove App"].waitForExistence(timeout: 5))
-                    } else if springboard.collectionViews.buttons["Options"].exists {
+                    }
+                    if springboard.collectionViews.buttons["Options"].exists {
                         // We long-pressed the app icon, and the "Remove App" button isn't showing up, but an "Options" button is.
                         // Sometimes, for reasons probably not known to anyone, the home screen will put the "Remove App" button into
                         // an "Options" submenu, instead of placing it in the root of the menu.
                         // So we first need to navigate to that submenu, and then try again
                         springboard.collectionViews.buttons["Options"].tap()
                         XCTAssert(springboard.buttons["Remove App"].waitForExistence(timeout: 5))
-                    } else {
-                        XCTFail("Unable to find 'Remove App' button")
                     }
                 }
                 springboard.buttons["Remove App"].tap()
@@ -116,9 +115,9 @@ extension XCUIApplication {
             XCTAssert(notifications.buttons["Delete"].waitForExistence(timeout: 2.0))
             notifications.buttons["Delete"].tap() // currently no better way of hitting some "random" delete button.
             #else
-            XCTAssertTrue(springboard.alerts["Remove “\(appName)”?"].buttons["Delete App"].waitForExistence(timeout: 10.0))
+            XCTAssert(springboard.alerts["Remove “\(appName)”?"].buttons["Delete App"].waitForExistence(timeout: 10.0))
             springboard.alerts["Remove “\(appName)”?"].buttons["Delete App"].tap()
-            XCTAssertTrue(springboard.alerts["Delete “\(appName)”?"].buttons["Delete"].waitForExistence(timeout: 10.0))
+            XCTAssert(springboard.alerts["Delete “\(appName)”?"].buttons["Delete"].waitForExistence(timeout: 10.0))
             springboard.alerts["Delete “\(appName)”?"].buttons["Delete"].tap()
             #endif
 

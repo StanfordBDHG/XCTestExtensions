@@ -129,12 +129,12 @@ final class TextEntryTests: XCTestCase, Sendable {
             #if os(visionOS)
             XCTAssert(app.visionOSKeyboard.wait(for: .runningForeground, timeout: 2.0))
             #elseif !os(macOS)
-            XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 2.0))
+            XCTAssert(app.keyboards.firstMatch.waitForExistence(timeout: 2.0))
             #endif
             
             app.dismissKeyboard()
             #if !os(visionOS) && !os(macOS)
-            XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 2.0))
+            XCTAssert(app.keyboards.firstMatch.waitForNonExistence(timeout: 2.0))
             #endif
         }
         
