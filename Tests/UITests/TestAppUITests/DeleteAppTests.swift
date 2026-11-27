@@ -52,7 +52,10 @@ final class DeleteAppTests: XCTestCase {
         
         if app.staticTexts["Has access"].waitForNonExistence(timeout: 2) {
             // if the view isn't telling us that it has access, it's currently requesting access
-            app.tables.staticTexts["Turn On All"].tap()
+            // iOS 27 no longer presents the permission list as a table, so match the element regardless of its type.
+            let turnOnAll = app.descendants(matching: .any)["Turn On All"].firstMatch
+            XCTAssert(turnOnAll.waitForExistence(timeout: 5.0))
+            turnOnAll.tap()
             app.buttons["UIA.Health.Allow.Button"].tap()
         }
         

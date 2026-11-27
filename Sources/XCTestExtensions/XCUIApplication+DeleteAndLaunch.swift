@@ -139,7 +139,10 @@ extension XCUIApplication {
             }
         }
     }
+}
 
+
+extension XCUIApplication {
     /// Finds an icon with the given name that is currently on screen, paging through the home screen if needed.
     ///
     /// Several apps can share a name (most Spezi packages ship a "TestApp"), which can push an icon onto a later page.
