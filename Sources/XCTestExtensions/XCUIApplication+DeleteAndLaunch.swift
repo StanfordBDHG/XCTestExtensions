@@ -69,15 +69,15 @@ extension XCUIApplication {
 
         // There might be multiple apps installed with the same name (e.g., we use "TestApp" a lot), so delete all of them
         while homeScreenIcons[appName].firstMatch.waitForExistence(timeout: 10.0) {
-            if !homeScreenIcons[appName].firstMatch.isHittable {
-                springboard.swipeLeft()
+            guard let icon = Self.findVisibleIcon(named: appName, in: homeScreenIcons, on: springboard) else {
+                XCTFail("Could not find a visible \"\(appName)\" icon on any home screen page.")
+                return
             }
 
-            XCTAssert(homeScreenIcons[appName].firstMatch.isHittable)
             #if os(visionOS)
-            homeScreenIcons[appName].firstMatch.press(forDuration: 1)
+            icon.press(forDuration: 1)
             #else
-            homeScreenIcons[appName].firstMatch.press(forDuration: 1.5)
+            icon.press(forDuration: 1.5)
             #endif
             
             if XCUIApplication.visionOS2 {
@@ -91,8 +91,8 @@ extension XCUIApplication {
                         // The long press did not work, let's launch the springboard again and then try long pressing the app icon again.
                         springboard.activate()
                         XCTAssert(springboard.wait(for: .runningForeground, timeout: 2.0))
-                        XCTAssert(homeScreenIcons[appName].firstMatch.isHittable)
-                        homeScreenIcons[appName].firstMatch.press(forDuration: 1.75)
+                        XCTAssert(icon.isHittable)
+                        icon.press(forDuration: 1.75)
                     }
                     if springboard.collectionViews.buttons["Options"].exists {
                         // We long-pressed the app icon, and the "Remove App" button isn't showing up, but an "Options" button is.
@@ -102,6 +102,10 @@ extension XCUIApplication {
                         springboard.collectionViews.buttons["Options"].tap()
                         XCTAssert(springboard.buttons["Remove App"].waitForExistence(timeout: 5))
                     }
+                }
+                guard springboard.buttons["Remove App"].waitForExistence(timeout: 2.0) else {
+                    XCTFail("The context menu of \"\(appName)\" did not show a \"Remove App\" button.")
+                    return
                 }
                 springboard.buttons["Remove App"].tap()
             }
@@ -135,4 +139,63 @@ extension XCUIApplication {
             }
         }
     }
+
+    /// Finds an icon with the given name that is currently on screen, paging through the home screen if needed.
+    ///
+    /// Several apps can share a name (most Spezi packages ship a "TestApp"), which can push an icon onto a later page.
+    /// The home screen also remembers the last page shown, so the search starts from the first page when the page indicator is available.
+    @available(macOS, unavailable)
+    @available(watchOS, unavailable)
+    private static func findVisibleIcon(named name: String, in icons: XCUIElementQuery, on springboard: XCUIApplication) -> XCUIElement? {
+        func visibleIcon() -> XCUIElement? {
+            icons.matching(identifier: name).allElementsBoundByIndex.first { icon in
+                // Only query `isHittable` for icons within the screen bounds, since it can record a failure for off-screen elements.
+                let frame = icon.frame
+                return !frame.isEmpty && springboard.frame.contains(CGPoint(x: frame.midX, y: frame.midY)) && icon.isHittable
+            }
+        }
+
+        if let icon = visibleIcon() {
+            return icon
+        }
+
+        #if os(iOS)
+        let pages = homeScreenPages(of: springboard)
+        // Return to the first page; swiping right on the first page would open the Today view instead.
+        for _ in 0..<max((pages?.current ?? 1) - 1, 0) {
+            springboard.swipeRight()
+        }
+        let maxSwipes = (pages?.total ?? 10) - 1
+        #else
+        let maxSwipes = 1
+        #endif
+
+        for swipe in 0...maxSwipes {
+            if swipe > 0 {
+                springboard.swipeLeft()
+            }
+            // Give the page transition a moment to settle before checking the icons on the new page.
+            let predicate = NSPredicate { _, _ in visibleIcon() != nil }
+            _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: nil)], timeout: 1.0)
+            if let icon = visibleIcon() {
+                return icon
+            }
+        }
+        return nil
+    }
+
+    #if os(iOS)
+    /// Reads the current page and the total number of pages from the home screen page indicator, e.g., "Page 2 of 3".
+    private static func homeScreenPages(of springboard: XCUIApplication) -> (current: Int, total: Int)? {
+        let indicator = springboard.pageIndicators.firstMatch
+        guard indicator.exists, let value = indicator.value as? String else {
+            return nil
+        }
+        let numbers = value.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
+        guard numbers.count == 2 else {
+            return nil
+        }
+        return (numbers[0], numbers[1])
+    }
+    #endif
 }
