@@ -52,11 +52,15 @@ final class DeleteAppTests: XCTestCase {
         
         if app.staticTexts["Has access"].waitForNonExistence(timeout: 2) {
             // if the view isn't telling us that it has access, it's currently requesting access
-            // iOS 27 no longer presents the permission list as a table, so match the element regardless of its type.
-            let turnOnAll = app.descendants(matching: .any)["Turn On All"].firstMatch
-            XCTAssert(turnOnAll.waitForExistence(timeout: 5.0))
-            turnOnAll.tap()
-            app.buttons["UIA.Health.Allow.Button"].tap()
+            // iOS 27 replaced the "Turn On All" table cell with a "Select All" cell, so match either one.
+            let selectAll = app.descendants(matching: .any).matching(
+                NSPredicate(format: "identifier == 'UIA.Health.AuthSheet.AllCategoryButton' OR label == 'Turn On All'")
+            ).firstMatch
+            XCTAssert(selectAll.waitForExistence(timeout: 5.0))
+            selectAll.tap()
+            let allowButton = app.buttons["UIA.Health.Allow.Button"]
+            XCTAssert(allowButton.wait(for: \.isEnabled, toEqual: true, timeout: 5.0))
+            allowButton.tap()
         }
         
         XCTAssert(app.staticTexts["Did add sample!"].waitForExistence(timeout: 5))
