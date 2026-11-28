@@ -72,8 +72,10 @@ extension XCUIApplication {
         let homeScreenIcons = springboard.otherElements["Home screen icons"].icons
         #endif
 
+        var missedDeletePrompts = 0
+
         // There might be multiple apps installed with the same name (e.g., we use "TestApp" a lot), so delete all of them
-        while homeScreenIcons[appName].firstMatch.waitForExistence(timeout: 10.0) {
+        while missedDeletePrompts < 3 && homeScreenIcons[appName].firstMatch.waitForExistence(timeout: 10.0) {
             guard let icon = Self.findVisibleIcon(named: appName, in: homeScreenIcons, on: springboard) else {
                 XCTFail("Could not find a visible \"\(appName)\" icon on any home screen page.")
                 return
@@ -89,7 +91,7 @@ extension XCUIApplication {
                 // VisionOS 2.0 changed the behavior how apps are deleted, showing a delete button above the app icon.
                 // Every icon shows a delete button while editing the home screen, so only look at the one that was pressed.
                 let deleteButton = icon.buttons["Delete"]
-                XCTAssert(deleteButton.waitForExistence(timeout: 5.0))
+                XCTAssert(deleteButton.wait(for: \.isHittable, toEqual: true, timeout: 5.0))
                 deleteButton.tap()
             } else { // iPhone / iPad / visionOS 1
                 if !springboard.collectionViews.buttons["Remove App"].waitForExistence(timeout: 5) {
@@ -117,12 +119,11 @@ extension XCUIApplication {
             }
 
             #if os(visionOS)
-            // alerts are running in their own process on visionOS (lol). Took me literally 3 hours.
-            let notifications = visionOSNotifications
-
-            XCTAssert(notifications.staticTexts["Delete “\(appName)”?"].waitForExistence(timeout: 5.0))
-            XCTAssert(notifications.buttons["Delete"].waitForExistence(timeout: 2.0))
-            notifications.buttons["Delete"].tap() // currently no better way of hitting some "random" delete button.
+            guard Self.confirmDeletionOnVisionOS(of: appName, missedPrompts: &missedDeletePrompts) else {
+                // Relaunch the home screen to reset its state and try again.
+                springboard.launch()
+                continue
+            }
             #else
             XCTAssert(springboard.alerts["Remove “\(appName)”?"].buttons["Delete App"].waitForExistence(timeout: 10.0))
             springboard.alerts["Remove “\(appName)”?"].buttons["Delete App"].tap()
@@ -149,6 +150,26 @@ extension XCUIApplication {
 
 
 extension XCUIApplication {
+    #if os(visionOS)
+    /// Confirms the deletion prompt on visionOS. Returns `false` if the prompt did not appear.
+    ///
+    /// The icons rearrange after each deletion, so the tap on the delete button can land elsewhere (e.g., open Notification Center).
+    private static func confirmDeletionOnVisionOS(of appName: String, missedPrompts: inout Int) -> Bool {
+        // alerts are running in their own process on visionOS (lol). Took me literally 3 hours.
+        let notifications = visionOSNotifications
+        guard notifications.staticTexts["Delete “\(appName)”?"].waitForExistence(timeout: 5.0) else {
+            missedPrompts += 1
+            if missedPrompts >= 3 {
+                XCTFail("The delete confirmation for \"\(appName)\" did not appear.")
+            }
+            return false
+        }
+        XCTAssert(notifications.buttons["Delete"].waitForExistence(timeout: 2.0))
+        notifications.buttons["Delete"].tap() // currently no better way of hitting some "random" delete button.
+        return true
+    }
+    #endif
+
     /// Finds an icon with the given name that is currently on screen, paging through the home screen if needed.
     ///
     /// Several apps can share a name (most Spezi packages ship a "TestApp"), which can push an icon onto a later page.
@@ -184,11 +205,14 @@ extension XCUIApplication {
                 springboard.swipeLeft()
             }
             // Give the page transition a moment to settle before checking the icons on the new page.
-            let predicate = NSPredicate { _, _ in visibleIcon() != nil }
-            _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: nil)], timeout: 1.0)
-            if let icon = visibleIcon() {
-                return icon
-            }
+            // This polls instead of using an `XCTWaiter`, which can interrupt a running query and record a failure.
+            let deadline = Date().addingTimeInterval(1.0)
+            repeat {
+                if let icon = visibleIcon() {
+                    return icon
+                }
+                usleep(200_000)
+            } while Date() < deadline
         }
         return nil
     }
