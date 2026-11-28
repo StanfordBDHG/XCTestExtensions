@@ -65,25 +65,33 @@ extension XCUIApplication {
         springboard.activate()
         #endif
         
+        #if os(visionOS)
+        // The visionOS 26 home screen no longer groups its icons in a "Home screen icons" element.
+        let homeScreenIcons = springboard.icons
+        #else
         let homeScreenIcons = springboard.otherElements["Home screen icons"].icons
+        #endif
+
+        var missedDeletePrompts = 0
 
         // There might be multiple apps installed with the same name (e.g., we use "TestApp" a lot), so delete all of them
-        while homeScreenIcons[appName].firstMatch.waitForExistence(timeout: 10.0) {
-            if !homeScreenIcons[appName].firstMatch.isHittable {
-                springboard.swipeLeft()
+        while missedDeletePrompts < 3 && homeScreenIcons[appName].firstMatch.waitForExistence(timeout: 10.0) {
+            guard let icon = Self.findVisibleIcon(named: appName, in: homeScreenIcons, on: springboard) else {
+                XCTFail("Could not find a visible \"\(appName)\" icon on any home screen page.")
+                return
             }
 
-            XCTAssert(homeScreenIcons[appName].firstMatch.isHittable)
             #if os(visionOS)
-            homeScreenIcons[appName].firstMatch.press(forDuration: 1)
+            icon.press(forDuration: 1)
             #else
-            homeScreenIcons[appName].firstMatch.press(forDuration: 1.5)
+            icon.press(forDuration: 1.5)
             #endif
             
             if XCUIApplication.visionOS2 {
                 // VisionOS 2.0 changed the behavior how apps are deleted, showing a delete button above the app icon.
-                let deleteButton = homeScreenIcons[appName].buttons["Delete"]
-                XCTAssert(deleteButton.waitForExistence(timeout: 5.0))
+                // Every icon shows a delete button while editing the home screen, so only look at the one that was pressed.
+                let deleteButton = icon.buttons["Delete"]
+                XCTAssert(deleteButton.wait(for: \.isHittable, toEqual: true, timeout: 5.0))
                 deleteButton.tap()
             } else { // iPhone / iPad / visionOS 1
                 if !springboard.collectionViews.buttons["Remove App"].waitForExistence(timeout: 5) {
@@ -91,8 +99,8 @@ extension XCUIApplication {
                         // The long press did not work, let's launch the springboard again and then try long pressing the app icon again.
                         springboard.activate()
                         XCTAssert(springboard.wait(for: .runningForeground, timeout: 2.0))
-                        XCTAssert(homeScreenIcons[appName].firstMatch.isHittable)
-                        homeScreenIcons[appName].firstMatch.press(forDuration: 1.75)
+                        XCTAssert(icon.isHittable)
+                        icon.press(forDuration: 1.75)
                     }
                     if springboard.collectionViews.buttons["Options"].exists {
                         // We long-pressed the app icon, and the "Remove App" button isn't showing up, but an "Options" button is.
@@ -103,16 +111,19 @@ extension XCUIApplication {
                         XCTAssert(springboard.buttons["Remove App"].waitForExistence(timeout: 5))
                     }
                 }
+                guard springboard.buttons["Remove App"].waitForExistence(timeout: 2.0) else {
+                    XCTFail("The context menu of \"\(appName)\" did not show a \"Remove App\" button.")
+                    return
+                }
                 springboard.buttons["Remove App"].tap()
             }
 
             #if os(visionOS)
-            // alerts are running in their own process on visionOS (lol). Took me literally 3 hours.
-            let notifications = visionOSNotifications
-
-            XCTAssert(notifications.staticTexts["Delete “\(appName)”?"].waitForExistence(timeout: 5.0))
-            XCTAssert(notifications.buttons["Delete"].waitForExistence(timeout: 2.0))
-            notifications.buttons["Delete"].tap() // currently no better way of hitting some "random" delete button.
+            guard Self.confirmDeletionOnVisionOS(of: appName, missedPrompts: &missedDeletePrompts) else {
+                // Relaunch the home screen to reset its state and try again.
+                springboard.launch()
+                continue
+            }
             #else
             XCTAssert(springboard.alerts["Remove “\(appName)”?"].buttons["Delete App"].waitForExistence(timeout: 10.0))
             springboard.alerts["Remove “\(appName)”?"].buttons["Delete App"].tap()
@@ -135,4 +146,89 @@ extension XCUIApplication {
             }
         }
     }
+}
+
+
+extension XCUIApplication {
+    #if os(visionOS)
+    /// Confirms the deletion prompt on visionOS. Returns `false` if the prompt did not appear.
+    ///
+    /// The icons rearrange after each deletion, so the tap on the delete button can land elsewhere (e.g., open Notification Center).
+    private static func confirmDeletionOnVisionOS(of appName: String, missedPrompts: inout Int) -> Bool {
+        // alerts are running in their own process on visionOS (lol). Took me literally 3 hours.
+        let notifications = visionOSNotifications
+        guard notifications.staticTexts["Delete “\(appName)”?"].waitForExistence(timeout: 5.0) else {
+            missedPrompts += 1
+            if missedPrompts >= 3 {
+                XCTFail("The delete confirmation for \"\(appName)\" did not appear.")
+            }
+            return false
+        }
+        XCTAssert(notifications.buttons["Delete"].waitForExistence(timeout: 2.0))
+        notifications.buttons["Delete"].tap() // currently no better way of hitting some "random" delete button.
+        return true
+    }
+    #endif
+
+    /// Finds an icon with the given name that is currently on screen, paging through the home screen if needed.
+    ///
+    /// Several apps can share a name (most Spezi packages ship a "TestApp"), which can push an icon onto a later page.
+    /// The home screen also remembers the last page shown, so the search starts from the first page when the page indicator is available.
+    @available(macOS, unavailable)
+    @available(watchOS, unavailable)
+    private static func findVisibleIcon(named name: String, in icons: XCUIElementQuery, on springboard: XCUIApplication) -> XCUIElement? {
+        func visibleIcon() -> XCUIElement? {
+            icons.matching(identifier: name).allElementsBoundByIndex.first { icon in
+                // Only query `isHittable` for icons within the screen bounds, since it can record a failure for off-screen elements.
+                let frame = icon.frame
+                return !frame.isEmpty && springboard.frame.contains(CGPoint(x: frame.midX, y: frame.midY)) && icon.isHittable
+            }
+        }
+
+        if let icon = visibleIcon() {
+            return icon
+        }
+
+        #if os(iOS)
+        let pages = homeScreenPages(of: springboard)
+        // Return to the first page; swiping right on the first page would open the Today view instead.
+        for _ in 0..<max((pages?.current ?? 1) - 1, 0) {
+            springboard.swipeRight()
+        }
+        let maxSwipes = (pages?.total ?? 10) - 1
+        #else
+        let maxSwipes = 1
+        #endif
+
+        for swipe in 0...maxSwipes {
+            if swipe > 0 {
+                springboard.swipeLeft()
+            }
+            // Give the page transition a moment to settle before checking the icons on the new page.
+            // This polls instead of using an `XCTWaiter`, which can interrupt a running query and record a failure.
+            let deadline = Date().addingTimeInterval(1.0)
+            repeat {
+                if let icon = visibleIcon() {
+                    return icon
+                }
+                usleep(200_000)
+            } while Date() < deadline
+        }
+        return nil
+    }
+
+    #if os(iOS)
+    /// Reads the current page and the total number of pages from the home screen page indicator, e.g., "Page 2 of 3".
+    private static func homeScreenPages(of springboard: XCUIApplication) -> (current: Int, total: Int)? {
+        let indicator = springboard.pageIndicators.firstMatch
+        guard indicator.exists, let value = indicator.value as? String else {
+            return nil
+        }
+        let numbers = value.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
+        guard numbers.count == 2 else {
+            return nil
+        }
+        return (numbers[0], numbers[1])
+    }
+    #endif
 }

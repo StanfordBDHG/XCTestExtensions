@@ -26,7 +26,11 @@ final class DeleteAppTests: XCTestCase {
         #endif
         
         let app = XCUIApplication()
-        app.deleteAndLaunch(withSpringboardAppName: "TestApp")
+        app.delete(app: "TestApp")
+        // Make sure the app was actually removed, not just that the deletion was skipped.
+        let homeScreen = XCUIApplication(bundleIdentifier: XCUIApplication.homeScreenBundle)
+        XCTAssert(homeScreen.icons["TestApp"].waitForNonExistence(timeout: 5.0))
+        app.launch()
         
         XCTAssert(app.buttons["Text Entry"].waitForExistence(timeout: 5.0))
         app.buttons["Text Entry"].tap()
@@ -52,8 +56,15 @@ final class DeleteAppTests: XCTestCase {
         
         if app.staticTexts["Has access"].waitForNonExistence(timeout: 2) {
             // if the view isn't telling us that it has access, it's currently requesting access
-            app.tables.staticTexts["Turn On All"].tap()
-            app.buttons["UIA.Health.Allow.Button"].tap()
+            // iOS 27 replaced the "Turn On All" table cell with a "Select All" cell, so match either one.
+            let selectAll = app.descendants(matching: .any).matching(
+                NSPredicate(format: "identifier == 'UIA.Health.AuthSheet.AllCategoryButton' OR label == 'Turn On All'")
+            ).firstMatch
+            XCTAssert(selectAll.waitForExistence(timeout: 5.0))
+            selectAll.tap()
+            let allowButton = app.buttons["UIA.Health.Allow.Button"]
+            XCTAssert(allowButton.wait(for: \.isEnabled, toEqual: true, timeout: 5.0))
+            allowButton.tap()
         }
         
         XCTAssert(app.staticTexts["Did add sample!"].waitForExistence(timeout: 5))
