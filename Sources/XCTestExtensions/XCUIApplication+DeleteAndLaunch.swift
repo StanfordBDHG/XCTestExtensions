@@ -87,7 +87,8 @@ extension XCUIApplication {
             
             if XCUIApplication.visionOS2 {
                 // VisionOS 2.0 changed the behavior how apps are deleted, showing a delete button above the app icon.
-                let deleteButton = homeScreenIcons[appName].buttons["Delete"]
+                // Every icon shows a delete button while editing the home screen, so only look at the one that was pressed.
+                let deleteButton = icon.buttons["Delete"]
                 XCTAssert(deleteButton.waitForExistence(timeout: 5.0))
                 deleteButton.tap()
             } else { // iPhone / iPad / visionOS 1
