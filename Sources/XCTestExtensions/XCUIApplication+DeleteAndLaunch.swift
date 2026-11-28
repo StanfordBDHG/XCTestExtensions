@@ -65,7 +65,12 @@ extension XCUIApplication {
         springboard.activate()
         #endif
         
+        #if os(visionOS)
+        // The visionOS 26 home screen no longer groups its icons in a "Home screen icons" element.
+        let homeScreenIcons = springboard.icons
+        #else
         let homeScreenIcons = springboard.otherElements["Home screen icons"].icons
+        #endif
 
         // There might be multiple apps installed with the same name (e.g., we use "TestApp" a lot), so delete all of them
         while homeScreenIcons[appName].firstMatch.waitForExistence(timeout: 10.0) {

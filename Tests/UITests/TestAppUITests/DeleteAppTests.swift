@@ -26,7 +26,11 @@ final class DeleteAppTests: XCTestCase {
         #endif
         
         let app = XCUIApplication()
-        app.deleteAndLaunch(withSpringboardAppName: "TestApp")
+        app.delete(app: "TestApp")
+        // Make sure the app was actually removed, not just that the deletion was skipped.
+        let homeScreen = XCUIApplication(bundleIdentifier: XCUIApplication.homeScreenBundle)
+        XCTAssert(homeScreen.icons["TestApp"].waitForNonExistence(timeout: 5.0))
+        app.launch()
         
         XCTAssert(app.buttons["Text Entry"].waitForExistence(timeout: 5.0))
         app.buttons["Text Entry"].tap()
